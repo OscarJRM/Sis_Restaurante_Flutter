@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sistema_restaurante/models/platos.dart';
 import 'package:sistema_restaurante/models/pedidos.dart';
+import 'package:sistema_restaurante/pages/wArgumentos.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class pedidoCustom extends StatelessWidget {
   final Pedido pedido;
@@ -9,6 +12,7 @@ class pedidoCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
     return Container(
       decoration: const BoxDecoration(
           boxShadow: [
@@ -52,17 +56,27 @@ class pedidoCustom extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Container(
-                      height: 30,
-                      width: 100,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFFE57734),
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      child: const Center(
-                        child:
-                            Text("Ver", style: TextStyle(color: Colors.white)),
-                      ),
-                    )
+                    Builder(builder: (innercontext) {
+                      return GestureDetector(
+                        onTap: () {
+                          globalState.updateIdPed(globalState.idPed);
+                          print(globalState.idPed);
+                          Navigator.pushNamed(context, '/menu');
+                        },
+                        child: Container(
+                          height: 30,
+                          width: 100,
+                          decoration: const BoxDecoration(
+                              color: Color(0xFFE57734),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))),
+                          child: const Center(
+                            child: Text("Ver",
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      );
+                    })
                   ],
                 )
               ],

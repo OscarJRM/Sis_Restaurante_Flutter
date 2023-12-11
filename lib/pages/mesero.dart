@@ -1,6 +1,7 @@
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
 import 'productosMesero.dart';
+import 'package:badges/badges.dart' as badges;
 
 class Mesero extends StatelessWidget {
   const Mesero({super.key});
@@ -11,7 +12,9 @@ class Mesero extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 106, right: 20),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, '/carrito');
+          },
           backgroundColor: const Color(0xFFE57734),
           child: const Stack(
             children: [
@@ -39,9 +42,17 @@ class Mesero extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.shopping_bag, color: Colors.white)),
+          badges.Badge(
+            badgeContent: const Text(
+              '3',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            child: Icon(Icons.shopping_bag, color: Colors.white),
+            badgeStyle: badges.BadgeStyle(
+              badgeColor: Color(0xFFE57734),
+            ),
+          ),
           SizedBox(width: 20.0)
         ],
         leading: IconButton(

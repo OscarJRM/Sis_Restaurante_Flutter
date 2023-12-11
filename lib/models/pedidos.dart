@@ -34,6 +34,7 @@ List<Pedido> cargarPedidos(Result result) {
 
 void main() async {
   final conn = await DatabaseConnection.openConnection();
+  List<ResultRow> Lista =[];
 
   /*final resultPedidos1 = await conn.execute("SELECT * from MAESTRO_PEDIDOS");
 
@@ -43,6 +44,14 @@ void main() async {
         'ID: ${row[0]}, Fecha/Hora: ${row[1]}, Total: ${row[2]}, Cédula Empleado: ${row[3]}, Número Mesa: ${row[4]}, ID Estado: ${row[5]}');
   });
   */
+  final result = await conn
+      .execute("SELECT * from Productos where ID_PRO=\$1", parameters: [1]);
+  Lista = result;
+print('Valor de la columna 3: ${Lista.isNotEmpty ? Lista[0][4] : "Lista vacía"}');
+  Lista.forEach((row) {
+    print(
+        'ID: ${row[0]}, Fecha/Hora: ${row[1]}, Total: ${row[2]}, Cédula Empleado: ${row[3]}, Número Mesa: ${row[4]}');
+  });
   try {
     final results1 = await conn.execute('SELECT * FROM ESTADOS_PEDIDO');
 
@@ -63,8 +72,9 @@ void main() async {
   });
 
   // Cargar datos de la tabla PEDIDOS
-  final resultPedidos = await conn.execute('SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1',
-  parameters: ["1850464338"]);
+  final resultPedidos = await conn.execute(
+      'SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1',
+      parameters: ["1850464338"]);
   List<Pedido> listaPedidos = cargarPedidos(resultPedidos);
 
   // Imprimir la lista de pedidos

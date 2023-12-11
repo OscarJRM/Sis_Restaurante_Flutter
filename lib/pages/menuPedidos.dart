@@ -3,19 +3,23 @@ import "package:flutter/material.dart";
 import "package:sistema_restaurante/pages/Pedidos.dart";
 import "package:sistema_restaurante/pages/wArgumentos.dart";
 import 'Pedidos.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+
 
 class menuPedidos extends StatelessWidget {
   const menuPedidos({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+
     return Scaffold(
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 106, right: 20),
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/mesas',
-                arguments: WArgumentos("1850464338"));
+            Navigator.pushNamed(context, '/mesas');
           },
           backgroundColor: const Color(0xFFE57734),
           child: const Stack(
