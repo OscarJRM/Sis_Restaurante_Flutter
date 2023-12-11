@@ -13,8 +13,24 @@ class menuCarrito extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final globalState = Provider.of<GlobalState>(context, listen: false);
+    final globalState = Provider.of<GlobalState>(context, listen: false);
     return Scaffold(
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 106, right: 20),
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: const Color(0xFFE57734),
+          child: const Stack(
+            children: [
+              SizedBox(
+                height: 35,
+                width: 35,
+                child: Icon(FeatherIcons.send, color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 26, 27, 29),
         title: Text(

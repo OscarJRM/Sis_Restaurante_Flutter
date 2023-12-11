@@ -59,7 +59,7 @@ class pedidoCustom extends StatelessWidget {
                     Builder(builder: (innercontext) {
                       return GestureDetector(
                         onTap: () {
-                          globalState.updateIdPed(globalState.idPed);
+                          globalState.updateIdPed(pedido.idPed);
                           print(globalState.idPed);
                           Navigator.pushNamed(context, '/menu');
                         },

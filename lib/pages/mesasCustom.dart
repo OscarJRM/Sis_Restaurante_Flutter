@@ -69,6 +69,16 @@ class mesasCustom extends StatelessWidget {
                                                 "PEN"
                                               ],
                                             );
+
+                                            // Paso 2: Cambiar el estado de la mesa a "OCUPADA"
+                                            final result3 = await conn.execute(
+                                              r'UPDATE MESAS SET EST_MES = $1 WHERE NUM_MES = $2',
+                                              parameters: [
+                                                "OCUPADA",
+                                                mesa.numMes
+                                              ],
+                                            );
+
                                             await conn.close();
                                             Navigator.of(context).pop();
                                             Navigator.pushNamed(context, '/');

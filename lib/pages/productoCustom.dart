@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sistema_restaurante/models/platos.dart';
+import "../BaseDatos/conexion.dart";
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class productoCustom extends StatelessWidget {
   final Plato plato;
@@ -9,6 +12,7 @@ class productoCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
     return Container(
       decoration: const BoxDecoration(
           boxShadow: [
@@ -55,15 +59,23 @@ class productoCustom extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.w700),
                 ),
-                Container(
-                  height: 30,
-                  width: 100,
-                  decoration: const BoxDecoration(
-                      color: Color(0xFFE57734),
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                  child: const Center(
-                    child:
-                        Text("Añadir", style: TextStyle(color: Colors.white)),
+                GestureDetector(
+                  onTap: () async {
+                    final conn = await DatabaseConnection.openConnection();
+                    final result1 = await conn.execute(
+                        r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3)',
+                        parameters: [globalState.idPed, plato.idPro, 0.1]);
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 100,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFFE57734),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    child: const Center(
+                      child:
+                          Text("Añadir", style: TextStyle(color: Colors.white)),
+                    ),
                   ),
                 )
               ],

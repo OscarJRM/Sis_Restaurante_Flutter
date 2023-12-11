@@ -32,7 +32,7 @@ class _carritoState extends State<carrito> {
     final conn = await DatabaseConnection.openConnection();
     final result = await conn.execute(
         "SELECT * FROM DETALLE_PEDIDOS where ID_PED_PER =\$1",
-        parameters: [6]);
+        parameters: [globalState.idPed]);
     final result2 = await conn
         .execute("SELECT * from Productos where ID_PRO=\$1", parameters: [1]);
     setState(() {
@@ -41,8 +41,30 @@ class _carritoState extends State<carrito> {
     });
     await conn.close();
   }
-
-  @override
+   @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: listaCarrito != null
+          ? GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                mainAxisExtent: 250,
+                crossAxisCount: 1,
+                mainAxisSpacing: 23,
+                crossAxisSpacing: 24,
+              ),
+              itemCount: listaCarrito.length,
+              itemBuilder: (context, index) {
+                return carritoCustom1(
+                    detallePedido: listaCarrito[index]);
+              },
+            )
+          : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos
+    );
+  }
+  /*@override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -65,5 +87,5 @@ class _carritoState extends State<carrito> {
             )
           : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos
     );
-  }
+  }*/
 }
