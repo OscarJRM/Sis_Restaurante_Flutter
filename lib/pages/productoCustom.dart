@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -60,8 +59,8 @@ class productoCustom extends StatelessWidget {
                   height: 30,
                   width: 100,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE57734),
-                  ),
+                      color: Color(0xFFE57734),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
                   child: const Center(
                     child:
                         Text("Añadir", style: TextStyle(color: Colors.white)),

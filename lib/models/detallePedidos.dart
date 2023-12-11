@@ -2,48 +2,47 @@ import 'package:postgres/postgres.dart';
 import '../BaseDatos/conexion.dart';
 
 class DetallePedido {
-  String idPro;
-  String nomPro;
-  String preUni; // Cambiado a double
-  String urlImg;
-  String idCatPer;
+  late final int? idPed;
+  final String? productId;
+  final String? productName; // Cambiado a double
+  final String? initalPrice;
+  final String? productPrice;
+  final String? quantity;
+  final String? unitTag;
+  final String? image;
 
   DetallePedido({
-    required this.idPro,
-    required this.nomPro,
-    required this.preUni,
-    required this.urlImg,
-    required this.idCatPer,
+    required this.idPed,
+    required this.productId,
+    required this.productName,
+    required this.initalPrice,
+    required this.productPrice,
+    required this.quantity,
+    required this.unitTag,
+    required this.image
   });
+  DetallePedido.fromMap(Map<dynamic, dynamic> res)
+  : idPed = res['idPed'],
+  productId = res['productId'],
+  productName = res['productName'],
+  initalPrice = res['initalPrice'],
+  productPrice= res["productPrice"],
+  quantity= res["quantity"],
+  unitTag = res["unitTag"],
+  image = res["image"];
+
+  Map<String, Object?> toMap(){
+    return{
+      'idPed': idPed,
+      'productId': productId,
+      'productName': productName,
+      "initalPrice": initalPrice,
+      "productPrice": productPrice,
+      "quantity": quantity,
+      "unitTag": unitTag,
+      "image": image
+    };
+  }
 }
 
-List<DetallePedido> Pedido(Result result) {
-  return result.map((row) {
-    return DetallePedido(
-      idPro: row[0] as String,
-      preUni: row[2] as String,
-      nomPro: row[3] as String,
-      urlImg: row[4] as String,
-      idCatPer: row[5] as String,
-    );
-  }).toList();
-}
 
-void main() async {
-  final conn = await DatabaseConnection.openConnection();
-
-  // Utiliza query en lugar de execute para obtener un resultado
-  // Utiliza query en lugar de prepare y run para obtener un resultado
-  final result = await conn.execute("SELECT * from Productos");
-
-  // Llena la lista de platos con los resultados obtenidos
-  List<DetallePedido> listaPlatos = Pedido(result);
-
-  // Imprime la lista de platos
-  listaPlatos.forEach((plato) {
-    print(
-        'ID: ${plato.idPro}, Nombre: ${plato.nomPro}, Precio: ${plato.preUni}, URL Imagen: ${plato.urlImg}, ID Categoría: ${plato.idCatPer}');
-  });
-  // Cierra la conexión cuando hayas terminado de usarla
-  await conn.close();
-}
