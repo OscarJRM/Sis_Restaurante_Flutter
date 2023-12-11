@@ -1,14 +1,14 @@
 import 'package:postgres/postgres.dart';
 import '../BaseDatos/conexion.dart';
 
-class Plato {
+class DetallePedido {
   String idPro;
   String nomPro;
   String preUni; // Cambiado a double
   String urlImg;
   String idCatPer;
 
-  Plato({
+  DetallePedido({
     required this.idPro,
     required this.nomPro,
     required this.preUni,
@@ -17,9 +17,9 @@ class Plato {
   });
 }
 
-List<Plato> Platos(Result result) {
+List<DetallePedido> Pedido(Result result) {
   return result.map((row) {
-    return Plato(
+    return DetallePedido(
       idPro: row[0] as String,
       preUni: row[2] as String,
       nomPro: row[3] as String,
@@ -37,7 +37,7 @@ void main() async {
   final result = await conn.execute("SELECT * from Productos");
 
   // Llena la lista de platos con los resultados obtenidos
-  List<Plato> listaPlatos = Platos(result);
+  List<DetallePedido> listaPlatos = Pedido(result);
 
   // Imprime la lista de platos
   listaPlatos.forEach((plato) {
