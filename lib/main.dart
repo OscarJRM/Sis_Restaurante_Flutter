@@ -5,6 +5,7 @@ import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import 'package:sistema_restaurante/pages/mesero.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:sistema_restaurante/src/login.dart';
 
 void main() {
   runApp(
@@ -21,7 +22,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
-       globalState.updateCedEmpAti("1850464338");
+    globalState.updateCedEmpAti("1850464338");
     return MaterialApp(
       title: 'Restaurante',
       debugShowCheckedModeBanner: false,
@@ -30,10 +31,11 @@ class MainApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => menuPedidos(),
+        '/': (context) => Login(),
+        '/pedidos': (context) => menuPedidos(),
         '/mesas': (context) => menuMesas(),
         '/menu': (context) => Mesero(),
-        '/carrito': (context)=> menuCarrito(),
+        '/carrito': (context) => menuCarrito(),
       },
     );
   }
