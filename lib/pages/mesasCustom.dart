@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sistema_restaurante/models/mesas.dart';
+import '../BaseDatos/conexion.dart';
 
 class mesasCustom extends StatelessWidget {
   final Mesa mesa;
@@ -42,22 +43,57 @@ class mesasCustom extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 100,
-                        decoration: const BoxDecoration(
-                            color: Color(0xFFE57734),
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                        child: const Center(
-                          child: Text("Seleccionar",
-                              style: TextStyle(color: Colors.white)),
+                    Builder(builder: (innercontext) {
+                      return GestureDetector(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Cancelar")),
+                                      TextButton(
+                                          onPressed: () async {
+                                            final conn =
+                                                await DatabaseConnection
+                                                    .openConnection();
+                                            final result2 = await conn.execute(
+                                              r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES (CURRENT_TIMESTAMP, 0.1, $1, $2,$3)',
+                                              parameters: [
+                                                "1850464338",
+                                                mesa.numMes,
+                                                "PEN"
+                                              ],
+                                            );
+                                            await conn.close();
+                                            Navigator.of(context).pop();
+                                            Navigator.pushNamed(context, '/');
+                                          },
+                                          child: const Text("Aceptar"))
+                                    ],
+                                    title: const Text("Mesas"),
+                                    contentPadding: const EdgeInsets.all(20),
+                                    content: const Text(
+                                        "¿Estas seguro de seleccionar la mesa?"),
+                                  ));
+                        },
+                        child: Container(
+                          height: 30,
+                          width: 100,
+                          decoration: const BoxDecoration(
+                              color: Color(0xFFE57734),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))),
+                          child: const Center(
+                            child: Text("Seleccionar",
+                                style: TextStyle(color: Colors.white)),
+                          ),
                         ),
-                      ),
-                    )
+                      );
+                    })
                   ],
                 )
               ],

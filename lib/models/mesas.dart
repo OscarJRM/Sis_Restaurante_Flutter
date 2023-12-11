@@ -22,6 +22,11 @@ List<Mesa> cargarMesas(Result result) {
 
 void main() async {
   final conn = await DatabaseConnection.openConnection();
+  final result1 = await conn.execute(
+    r'INSERT INTO MESAS VALUES (2,$1)',
+    parameters: ["DISPONIBLE"]
+  );
+
 
   // Utiliza query en lugar de execute para obtener un resultado
   // Utiliza query en lugar de prepare y run para obtener un resultado
