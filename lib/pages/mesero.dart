@@ -31,30 +31,30 @@ class Mesero extends StatelessWidget {
           ),
         ),
       ),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 26, 27, 29),
+        title: Text(
+          "Menu",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.shopping_bag, color: Colors.white)),
+          SizedBox(width: 20.0)
+        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back, color: Colors.white)),
+      ),
       body: const Padding(
-        padding: EdgeInsets.only(top: 44, right: 16, left: 16, bottom: 44),
+        padding: EdgeInsets.only(top: 8, right: 16, left: 16, bottom: 44),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(Icons.arrow_back, color: Colors.white),
-                  Row(
-                    children: [
-                      Icon(
-                        FeatherIcons.search,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 16),
-                      Icon(
-                        FeatherIcons.heart,
-                        color: Colors.white,
-                      )
-                    ],
-                  )
-                ],
-              ),
               Padding(
                 padding: EdgeInsets.only(top: 44),
                 child: Expanded(child: ProductosMesero()),
