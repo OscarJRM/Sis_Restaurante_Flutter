@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import 'package:sistema_restaurante/pages/mesero.dart';
 
 void main() {
@@ -16,6 +17,6 @@ class MainApp extends StatelessWidget {
         theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF212325),
         ),
-        home: Mesero());
+        home: menuPedidos());
   }
 }

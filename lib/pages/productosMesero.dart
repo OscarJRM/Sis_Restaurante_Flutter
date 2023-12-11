@@ -48,7 +48,7 @@ class _ProductosMeseroState extends State<ProductosMesero> {
                 return productoCustom(plato: listaPlatos[index]);
               },
             )
-          : CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos
+          : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos
     );
   }
 }

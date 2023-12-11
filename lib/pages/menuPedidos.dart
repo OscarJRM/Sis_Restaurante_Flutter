@@ -1,9 +1,10 @@
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
-import 'productosMesero.dart';
+import "package:sistema_restaurante/pages/Pedidos.dart";
+import 'Pedidos.dart';
 
-class Mesero extends StatelessWidget {
-  const Mesero({super.key});
+class menuPedidos extends StatelessWidget {
+  const menuPedidos({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +19,8 @@ class Mesero extends StatelessWidget {
               SizedBox(
                 height: 35,
                 width: 35,
-                child: Icon(FeatherIcons.shoppingCart),
+                child: Icon(FeatherIcons.plus, color: Colors.black),
               ),
-              Positioned(
-                  top: 1,
-                  right: 1,
-                  child: CircleAvatar(
-                      radius: 8,
-                      child: Text("4", style: TextStyle(fontSize: 12)),
-                      backgroundColor: Colors.white))
             ],
           ),
         ),
@@ -34,16 +28,11 @@ class Mesero extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 26, 27, 29),
         title: Text(
-          "Menú",
+          "Menú Pedidos",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.shopping_bag, color: Colors.white)),
-          SizedBox(width: 20.0)
-        ],
+        actions: [SizedBox(width: 20.0)],
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -51,13 +40,13 @@ class Mesero extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white)),
       ),
       body: const Padding(
-        padding: EdgeInsets.only(top: 8, right: 16, left: 16, bottom: 44),
+        padding: EdgeInsets.only(top: 8, right: 10, left: 10, bottom: 44),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
                 padding: EdgeInsets.only(top: 44),
-                child: Expanded(child: ProductosMesero()),
+                child: Expanded(child: Pedidos()),
               )
             ],
           ),
