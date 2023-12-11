@@ -1,10 +1,11 @@
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
 import "package:sistema_restaurante/pages/Pedidos.dart";
+import "package:sistema_restaurante/pages/wArgumentos.dart";
 import 'Pedidos.dart';
 
 class menuPedidos extends StatelessWidget {
-  const menuPedidos({super.key});
+  const menuPedidos({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,10 @@ class menuPedidos extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 106, right: 20),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, '/mesas',
+                arguments: WArgumentos("1850464338"));
+          },
           backgroundColor: const Color(0xFFE57734),
           child: const Stack(
             children: [

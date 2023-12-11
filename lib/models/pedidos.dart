@@ -32,37 +32,6 @@ List<Pedido> cargarPedidos(Result result) {
   }).toList();
 }
 
-class Producto {
-  String idPro;
-  String nomPro;
-  double preUniPro;
-  String desPro;
-  String urlImgPro;
-  String idCatPer;
-
-  Producto({
-    required this.idPro,
-    required this.nomPro,
-    required this.preUniPro,
-    required this.desPro,
-    required this.urlImgPro,
-    required this.idCatPer,
-  });
-}
-
-List<Producto> cargarProductos(Result result) {
-  return result.map((row) {
-    return Producto(
-      idPro: row[0] as String,
-      nomPro: row[1] as String,
-      preUniPro: row[2] as double,
-      desPro: row[3] as String,
-      urlImgPro: row[4] as String,
-      idCatPer: row[5] as String,
-    );
-  }).toList();
-}
-
 void main() async {
   final conn = await DatabaseConnection.openConnection();
 
