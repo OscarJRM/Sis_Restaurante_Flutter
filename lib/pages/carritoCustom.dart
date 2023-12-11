@@ -12,7 +12,8 @@ import '../models/platos.dart';
 class carritoCustom1 extends StatefulWidget {
   final DetallePedido detallePedido;
   final Plato plato;
-  const carritoCustom1({required this.detallePedido, required this.plato, super.key});
+  const carritoCustom1(
+      {required this.detallePedido, required this.plato, super.key});
 
   @override
   State<carritoCustom1> createState() => _carritoCustom1State();
@@ -75,53 +76,51 @@ class _carritoCustom1State extends State<carritoCustom1> {
                       fontSize: 18,
                       fontWeight: FontWeight.w700),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Cantidad: ${widget.detallePedido.canProPed}",
-                      style:
-                          GoogleFonts.inter(color: Colors.white, fontSize: 18),
-                    )
-                  ],
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  "Cantidad: ${widget.detallePedido.canProPed}",
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 18),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      widget.detallePedido.idProPed,
-                      style: GoogleFonts.inter(
-                          color: const Color(0xFF999999),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Builder(builder: (innercontext) {
-                      return GestureDetector(
-                        onTap: () {
-                          globalState.updateIdPed(globalState.idPed);
-                          print(globalState.idPed);
-                          Navigator.pushNamed(context, '/menu');
-                        },
-                        child: Container(
-                          height: 30,
-                          width: 100,
-                          decoration: const BoxDecoration(
-                              color: Color(0xFFE57734),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5))),
-                          child: const Center(
-                            child: Text("Ver",
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ),
-                      );
-                    })
-                  ],
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  widget.detallePedido.idProPed,
+                  style: GoogleFonts.inter(
+                      color: const Color(0xFF999999),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700),
                 )
               ],
             ),
+            Row(
+              children: [
+                Builder(builder: (innercontext) {
+                  return GestureDetector(
+                    onTap: () {
+                      globalState.updateIdPed(globalState.idPed);
+                      print(globalState.idPed);
+                      Navigator.pushNamed(context, '/menu');
+                    },
+                    child: Container(
+                      height: 30,
+                      width: 100,
+                      decoration: const BoxDecoration(
+                          color: Color(0xFFE57734),
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: const Center(
+                        child:
+                            Text("Ver", style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                  );
+                })
+              ],
+            )
           ],
         ),
       ),
