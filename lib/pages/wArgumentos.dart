@@ -1,4 +1,6 @@
 class WArgumentos {
-  final String argument;
-  WArgumentos(this.argument);
+  final String cedula;
+ 
+  WArgumentos(this.cedula);
+
 }

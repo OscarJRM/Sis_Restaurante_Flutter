@@ -5,7 +5,8 @@ import '../BaseDatos/conexion.dart';
 
 class mesasCustom extends StatelessWidget {
   final Mesa mesa;
-  const mesasCustom({required this.mesa, super.key});
+  final String CED_EMP_ATI;
+  const mesasCustom({required this.mesa, required this.CED_EMP_ATI, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class mesasCustom extends StatelessWidget {
                                             final result2 = await conn.execute(
                                               r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES (CURRENT_TIMESTAMP, 0.1, $1, $2,$3)',
                                               parameters: [
-                                                "1850464338",
+                                                CED_EMP_ATI,
                                                 mesa.numMes,
                                                 "PEN"
                                               ],
