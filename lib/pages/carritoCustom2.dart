@@ -12,7 +12,8 @@ import '../models/platos.dart';
 class carritoCustom2 extends StatefulWidget {
   final DetallePedido detallePedido;
   final Plato plato;
-  const carritoCustom2({required this.detallePedido,required this.plato, super.key});
+  const carritoCustom2(
+      {required this.detallePedido, required this.plato, super.key});
 
   @override
   State<carritoCustom2> createState() => _carritoCustom2State();
@@ -81,10 +82,17 @@ class _carritoCustom2State extends State<carritoCustom2> {
               children: [
                 Builder(builder: (innercontext) {
                   return GestureDetector(
-                    onTap: () {
-                      globalState.updateIdPed(globalState.idPed);
-                      print(globalState.idPed);
-                      Navigator.pushNamed(context, '/menu');
+                    onTap: () async {
+                      final conn = await DatabaseConnection.openConnection();
+
+                      // Realiza la eliminación del producto de DETALLE_PEDIDOS
+                      final result = await conn.execute(
+                        'DELETE FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
+                        parameters: [globalState.idPed, widget.plato.idPro],
+                      );
+
+                      await conn.close();
+                      Navigator.pushReplacementNamed(context, '/carrito');
                     },
                     child: Container(
                       height: 30,
@@ -93,8 +101,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           color: Color(0xFFE57734),
                           borderRadius: BorderRadius.all(Radius.circular(5))),
                       child: const Center(
-                        child:
-                            Text("Ver", style: TextStyle(color: Colors.white)),
+                        child: Text("Borrar",
+                            style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   );

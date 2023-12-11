@@ -64,7 +64,7 @@ class productoCustom extends StatelessWidget {
                     final conn = await DatabaseConnection.openConnection();
                     final result1 = await conn.execute(
                         r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3)',
-                        parameters: [globalState.idPed, plato.idPro, 0.1]);
+                        parameters: [globalState.idPed, plato.idPro, 1.0]);
                   },
                   child: Container(
                     height: 30,
