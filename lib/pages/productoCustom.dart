@@ -18,35 +18,36 @@ class _productoCustomState extends State<productoCustom> {
   bool productoAgregado = false;
   Color buttonColor = Color(0xFFE57734);
 
- @override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  // Llamada a la función para verificar el estado del producto
-  verificarProductoAgregado().then((agregado) {
-    setState(() {
-      productoAgregado = agregado;
+    // Llamada a la función para verificar el estado del producto
+    verificarProductoAgregado().then((agregado) {
+      setState(() {
+        productoAgregado = agregado;
+      });
     });
-  });
-}
+  }
 
   Future<bool> verificarProductoAgregado() async {
     final globalState = Provider.of<GlobalState>(context, listen: false);
- final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.openConnection();
 
-  final result = await conn.execute(
-    'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
-    parameters: [globalState.idPed, widget.plato.idPro]
-  );
+    final result = await conn.execute(
+        'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
+        parameters: [globalState.idPed, widget.plato.idPro]);
 
-  // El resultado debería ser una lista con un único valor entero
-  if (result.isNotEmpty && result[0][0] != null && (result[0][0]! as int) > 0) {
-    return true; // El producto ya está en el carrito
-  } else {
-    return false; // El producto no está en el carrito
+    // El resultado debería ser una lista con un único valor entero
+    if (result.isNotEmpty &&
+        result[0][0] != null &&
+        (result[0][0]! as int) > 0) {
+      return true; // El producto ya está en el carrito
+    } else {
+      return false; // El producto no está en el carrito
+    }
   }
 
-  }
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
@@ -98,6 +99,13 @@ void initState() {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    final agregado = await verificarProductoAgregado();
+
+                    // Actualiza el estado después de que la verificación se haya completado
+                    setState(() {
+                      productoAgregado = agregado;
+                    });
+
                     if (!productoAgregado) {
                       // Cambia temporalmente el color del botón
                       setState(() {
