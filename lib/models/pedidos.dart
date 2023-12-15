@@ -43,7 +43,11 @@ void main() async {
     print(
         'ID: ${row[0]}, Fecha/Hora: ${row[1]}, Total: ${row[2]}, Cédula Empleado: ${row[3]}, Número Mesa: ${row[4]}, ID Estado: ${row[5]}');
   });
-  */
+  
+  final resultdele = await conn.execute(
+  'DELETE FROM MAESTRO_PEDIDOS WHERE ID_PED = \$1',
+  parameters: [10],
+);*/
   final result = await conn
       .execute("SELECT * from Productos where ID_PRO=\$1", parameters: [1]);
   Lista = result;

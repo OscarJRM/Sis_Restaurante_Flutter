@@ -32,7 +32,6 @@ class MainApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => Login(),
-        '/pedidos': (context) => menuPedidos(),
         '/mesas': (context) => menuMesas(),
         '/menu': (context) => Mesero(),
         '/carrito': (context) => menuCarrito(),

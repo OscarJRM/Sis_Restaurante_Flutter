@@ -28,7 +28,7 @@ class Mesero extends StatelessWidget {
                   right: 1,
                   child: CircleAvatar(
                       radius: 8,
-                      child: Text("4", style: TextStyle(fontSize: 12)),
+                      child: Text("", style: TextStyle(fontSize: 12)),
                       backgroundColor: Colors.white))
             ],
           ),
@@ -36,7 +36,7 @@ class Mesero extends StatelessWidget {
       ),
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 26, 27, 29),
-        title: Text(
+        title: const Text(
           "Menú",
           style: TextStyle(color: Colors.white),
         ),
@@ -44,7 +44,7 @@ class Mesero extends StatelessWidget {
         actions: [
           badges.Badge(
             badgeContent: const Text(
-              '3',
+              '',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),

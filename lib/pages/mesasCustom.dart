@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sistema_restaurante/models/mesas.dart';
+import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import '../BaseDatos/conexion.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class mesasCustom extends StatelessWidget {
   final Mesa mesa;
@@ -10,6 +13,7 @@ class mesasCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
     return Container(
       decoration: const BoxDecoration(
           boxShadow: [
@@ -81,7 +85,16 @@ class mesasCustom extends StatelessWidget {
 
                                             await conn.close();
                                             Navigator.of(context).pop();
-                                            Navigator.pushNamed(context, '/');
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    menuPedidos1(
+                                                        globalState.cedEmpAti,
+                                                        globalState.Nom,
+                                                        globalState.Ape),
+                                              ),
+                                            );
                                           },
                                           child: const Text("Aceptar"))
                                     ],

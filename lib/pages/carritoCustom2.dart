@@ -70,7 +70,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
             Row(
               children: [
                 Text(
-                  widget.detallePedido.idProPed,
+                  widget.plato.preUni,
                   style: GoogleFonts.inter(
                       color: const Color(0xFF999999),
                       fontSize: 18,

@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:postgres/postgres.dart';
+import 'package:sistema_restaurante/pages/menuCarrito.dart';
+import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import 'package:sistema_restaurante/src/conexion.dart';
 import 'package:sistema_restaurante/src/empleado.dart';
 
@@ -55,7 +57,7 @@ class _LoginState extends State<Login> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => empleado(result[0][0] as String,
+              builder: (context) => menuPedidos1(result[0][0] as String,
                   result[0][1] as String, result[0][2] as String)),
         );
         return true;
