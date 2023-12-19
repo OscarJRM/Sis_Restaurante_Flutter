@@ -64,7 +64,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
             children: [
               Padding(
                 padding: EdgeInsets.only(top: 44),
-                child: Expanded(child: Pedidos()),
+                child: Pedidos(),
               )
             ],
           ),

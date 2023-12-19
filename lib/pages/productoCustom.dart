@@ -21,9 +21,10 @@ class _productoCustomState extends State<productoCustom> {
   @override
   void initState() {
     super.initState();
-
-    // Llamada a la función para verificar el estado del producto
-    verificarProductoAgregado().then((agregado) {
+// We can't use async directly in initState, so we use a Future.delayed to schedule the task.
+    Future.delayed(Duration.zero, () async {
+      // Llamada a la función para verificar el estado del producto
+      final agregado = await verificarProductoAgregado();
       setState(() {
         productoAgregado = agregado;
       });

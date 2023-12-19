@@ -4,13 +4,14 @@ class DatabaseConnection {
   static Future<Connection> openConnection() async {
     final conn = await Connection.open(
         Endpoint(
-          host: 'roundhouse.proxy.rlwy.net',
-          port: 49265,
-          database: 'railway',
-          username: 'postgres',
-          password: 'CGbDFF*ABcg14D632A2c666cdBBB25*e',
+          host: 'restaurante-metodologias-agiles.postgres.database.azure.com',
+          port: 5432,
+          database: 'proyecto_restaurante',
+          username: 'AdminRestaurante',
+          password: 'Postgres123',
         ),
-        settings: ConnectionSettings(sslMode: SslMode.disable));
+        //settings: ConnectionSettings(sslMode: SslMode.disable)
+    );
 
     print('Connection established!');
     return conn;
