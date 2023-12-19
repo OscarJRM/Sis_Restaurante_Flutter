@@ -57,7 +57,24 @@ class pedidoCustom extends StatelessWidget {
                 Row(
                   children: [
                     Builder(builder: (innercontext) {
-                      return GestureDetector(
+                      return FilledButton(
+                          onPressed: () {
+                            globalState.updateIdPed(pedido.idPed);
+                            print(globalState.idPed);
+                            Navigator.pushNamed(context, '/menu');
+                          },
+                          child: Text("Ver"),
+                          style: ButtonStyle(
+                              mouseCursor: MaterialStateProperty.all(
+                                  SystemMouseCursors.click),
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5))),
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(100, 40)),
+                              backgroundColor:
+                                  MaterialStatePropertyAll(Color(0xFFE57734))));
+                      /*GestureDetector(
                         onTap: () {
                           globalState.updateIdPed(pedido.idPed);
                           print(globalState.idPed);
@@ -75,7 +92,7 @@ class pedidoCustom extends StatelessWidget {
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),
-                      );
+                      );*/
                     })
                   ],
                 )

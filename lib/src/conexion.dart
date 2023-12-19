@@ -8,11 +8,11 @@ class ConexionDB {
     try {
       return _conn = await Connection.open(
         Endpoint(
-          host: 'roundhouse.proxy.rlwy.net',
-          port: 49265,
-          database: 'railway',
-          username: 'postgres',
-          password: 'CGbDFF*ABcg14D632A2c666cdBBB25*e',
+          host: 'restaurante-metodologias-agiles.postgres.database.azure.com',
+          port: 5432,
+          database: 'proyecto_restaurante',
+          username: 'AdminRestaurante',
+          password: 'Postgres123',
         ),
         settings: const ConnectionSettings(sslMode: SslMode.require),
       );

@@ -49,7 +49,75 @@ class mesasCustom extends StatelessWidget {
                 Row(
                   children: [
                     Builder(builder: (innercontext) {
-                      return GestureDetector(
+                      return FilledButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Cancelar")),
+                                        TextButton(
+                                            onPressed: () async {
+                                              final conn =
+                                                  await DatabaseConnection
+                                                      .openConnection();
+                                              final result2 =
+                                                  await conn.execute(
+                                                r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES (CURRENT_TIMESTAMP, 0.1, $1, $2,$3)',
+                                                parameters: [
+                                                  CED_EMP_ATI,
+                                                  mesa.numMes,
+                                                  "PEN"
+                                                ],
+                                              );
+
+                                              // Paso 2: Cambiar el estado de la mesa a "OCUPADA"
+                                              final result3 =
+                                                  await conn.execute(
+                                                r'UPDATE MESAS SET EST_MES = $1 WHERE NUM_MES = $2',
+                                                parameters: [
+                                                  "OCUPADA",
+                                                  mesa.numMes
+                                                ],
+                                              );
+
+                                              await conn.close();
+                                              Navigator.of(context).pop();
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      menuPedidos1(
+                                                          globalState.cedEmpAti,
+                                                          globalState.Nom,
+                                                          globalState.Ape),
+                                                ),
+                                              );
+                                            },
+                                            child: const Text("Aceptar"))
+                                      ],
+                                      title: const Text("Mesas"),
+                                      contentPadding: const EdgeInsets.all(20),
+                                      content: const Text(
+                                          "¿Estas seguro de seleccionar la mesa?"),
+                                    ));
+                          },
+                          child: Text("Seleccionar"),
+                          style: ButtonStyle(
+                              mouseCursor: MaterialStateProperty.all(
+                                  SystemMouseCursors.click),
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5))),
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(100, 40)),
+                              backgroundColor:
+                                  MaterialStatePropertyAll(Color(0xFFE57734))));
+                      /*GestureDetector(
                         onTap: () {
                           showDialog(
                               context: context,
@@ -116,7 +184,7 @@ class mesasCustom extends StatelessWidget {
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),
-                      );
+                      );*/
                     })
                   ],
                 )

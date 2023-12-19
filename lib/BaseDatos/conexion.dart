@@ -10,7 +10,7 @@ class DatabaseConnection {
           username: 'AdminRestaurante',
           password: 'Postgres123',
         ),
-        //settings: ConnectionSettings(sslMode: SslMode.disable)
+        settings: const ConnectionSettings(sslMode: SslMode.require),
     );
 
     print('Connection established!');

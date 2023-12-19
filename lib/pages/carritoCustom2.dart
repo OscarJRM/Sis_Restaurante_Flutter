@@ -50,12 +50,14 @@ class _carritoCustom2State extends State<carritoCustom2> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Produto: ${widget.plato.nomPro}",
-                  style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700),
+                Expanded(
+                  child: Text(
+                    "Produto: ${widget.plato.nomPro}",
+                    style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),

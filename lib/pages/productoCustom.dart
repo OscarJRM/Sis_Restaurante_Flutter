@@ -25,9 +25,11 @@ class _productoCustomState extends State<productoCustom> {
     Future.delayed(Duration.zero, () async {
       // Llamada a la función para verificar el estado del producto
       final agregado = await verificarProductoAgregado();
-      setState(() {
-        productoAgregado = agregado;
-      });
+      if (mounted) {
+        setState(() {
+          productoAgregado = agregado;
+        });
+      }
     });
   }
 
@@ -98,7 +100,57 @@ class _productoCustomState extends State<productoCustom> {
                       fontSize: 18,
                       fontWeight: FontWeight.w700),
                 ),
-                GestureDetector(
+                FilledButton(
+                    onPressed: () async {
+                      final agregado = await verificarProductoAgregado();
+
+                      // Actualiza el estado después de que la verificación se haya completado
+                      setState(() {
+                        productoAgregado = agregado;
+                      });
+
+                      if (!productoAgregado) {
+                        // Marca el producto como añadido al carrito
+                        setState(() {
+                          productoAgregado = true;
+                        });
+
+                        // Tu lógica para añadir al carrito
+                        final conn = await DatabaseConnection.openConnection();
+                        final result1 = await conn.execute(
+                          r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3)',
+                          parameters: [
+                            globalState.idPed,
+                            widget.plato.idPro,
+                            1.0
+                          ],
+                        );
+
+                        // Muestra la notificación en el SnackBar
+                        const snackBar = SnackBar(
+                          content: Text('Producto añadido al carrito'),
+                          backgroundColor: Color(0xFFE57734),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else {
+                        // Muestra un mensaje o realiza alguna acción
+                        const snackBar1 = SnackBar(
+                          content: Text('El producto ya está en el carrito'),
+                          backgroundColor: Color(0xFFE57734),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar1);
+                      }
+                    },
+                    child: Text("Añadir"),
+                    style: ButtonStyle(
+                        mouseCursor:
+                            MaterialStateProperty.all(SystemMouseCursors.click),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5))),
+                        minimumSize: MaterialStateProperty.all(Size(100, 40)),
+                        backgroundColor:
+                            MaterialStatePropertyAll(Color(0xFFE57734))))
+                /*GestureDetector(
                   onTap: () async {
                     final agregado = await verificarProductoAgregado();
 
@@ -163,7 +215,7 @@ class _productoCustomState extends State<productoCustom> {
                           Text("Añadir", style: TextStyle(color: Colors.white)),
                     ),
                   ),
-                )
+                )*/
               ],
             ),
           )
