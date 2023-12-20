@@ -67,6 +67,7 @@ class _productoCustomState extends State<productoCustom> {
           CachedNetworkImage(
             imageUrl: widget.plato.urlImg,
             height: 100,
+            width: 230,
             fit: BoxFit.cover,
             placeholder: (context, url) => Container(
               height: 100,

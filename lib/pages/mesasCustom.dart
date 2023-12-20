@@ -22,7 +22,7 @@ class mesasCustom extends StatelessWidget {
           color: Color(0xFF212325),
           borderRadius: BorderRadius.all(Radius.circular(15))),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             Row(

@@ -6,8 +6,7 @@ import 'mesasCustom.dart';
 
 class Mesas extends StatefulWidget {
   final String CED_EMP_ATI1;
-    Mesas({Key? key, required this.CED_EMP_ATI1}) : super(key: key);
-
+  Mesas({Key? key, required this.CED_EMP_ATI1}) : super(key: key);
 
   @override
   State<Mesas> createState() => _MesasState();
@@ -24,7 +23,8 @@ class _MesasState extends State<Mesas> {
 
   Future<void> _fetchData() async {
     final conn = await DatabaseConnection.openConnection();
-    final result = await conn.execute("SELECT * FROM MESAS where EST_MES=\$1",parameters:["DISPONIBLE"] );
+    final result = await conn.execute("SELECT * FROM MESAS where EST_MES=\$1",
+        parameters: ["DISPONIBLE"]);
     setState(() {
       listaMesas = cargarMesas(result);
     });
@@ -47,7 +47,8 @@ class _MesasState extends State<Mesas> {
               ),
               itemCount: listaMesas.length,
               itemBuilder: (context, index) {
-                return mesasCustom(mesa: listaMesas[index],CED_EMP_ATI: widget.CED_EMP_ATI1);
+                return mesasCustom(
+                    mesa: listaMesas[index], CED_EMP_ATI: widget.CED_EMP_ATI1);
               },
             )
           : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos
