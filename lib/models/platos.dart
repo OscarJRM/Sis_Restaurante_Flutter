@@ -1,6 +1,7 @@
 import 'package:postgres/postgres.dart';
 import '../BaseDatos/conexion.dart';
 
+
 class Plato {
   String idPro;
   String nomPro;
@@ -29,6 +30,8 @@ List<Plato> Platos(Result result) {
   }).toList();
 }
 
+
+  // Puedes agregar más métodos según sea necesario, como eliminar un pedido, etc.
 void main() async {
   final conn = await DatabaseConnection.openConnection();
 

@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'productoCustom.dart';
 import '../models/platos.dart';
 import '../BaseDatos/conexion.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class ProductosMesero extends StatefulWidget {
   const ProductosMesero({Key? key}) : super(key: key);
@@ -36,6 +38,8 @@ Future<void> _fetchData() async {
 
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.pedidos.addAll(listaPlatos);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: listaPlatos != null

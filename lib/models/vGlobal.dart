@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/platos.dart';
 
 class GlobalState extends ChangeNotifier {
   String cedEmpAti = '';
@@ -22,5 +23,11 @@ class GlobalState extends ChangeNotifier {
 
   void updateApe(String newApe) {
     Ape = newApe;
+  }
+  List<Plato> pedidos = [];
+
+  void agregarPedido(Plato pedido) {
+    pedidos.add(pedido);
+    notifyListeners();
   }
 }

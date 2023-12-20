@@ -6,6 +6,7 @@ import 'package:sistema_restaurante/pages/mesero.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/src/login.dart';
+import 'package:sistema_restaurante/models/platos.dart';
 
 void main() {
   runApp(
@@ -23,6 +24,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
     globalState.updateCedEmpAti("1850464338");
+    
     return MaterialApp(
       title: 'Restaurante',
       debugShowCheckedModeBanner: false,
