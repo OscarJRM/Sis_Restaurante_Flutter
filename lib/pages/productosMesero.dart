@@ -22,23 +22,24 @@ class _ProductosMeseroState extends State<ProductosMesero> {
     _fetchData();
   }
 
-Future<void> _fetchData() async {
-  final conn = await DatabaseConnection.openConnection();
-  final result = await conn.execute("SELECT * from Productos");
+  Future<void> _fetchData() async {
+    final conn = await DatabaseConnection.openConnection();
+    final result = await conn.execute("SELECT * from Productos");
 
-  // Verifica si el widget está montado antes de llamar a setState
-  if (mounted) {
-    setState(() {
-      listaPlatos = Platos(result);
-    });
+    // Verifica si el widget está montado antes de llamar a setState
+    if (mounted) {
+      setState(() {
+        listaPlatos = Platos(result);
+      });
+    }
+
+    await conn.close();
   }
-
-  await conn.close();
-}
 
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.pedidos.clear();
     globalState.pedidos.addAll(listaPlatos);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),

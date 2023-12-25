@@ -16,7 +16,7 @@ class GlobalState extends ChangeNotifier {
     idPed = newIdPed;
     notifyListeners();
   }
-  
+
   void updateNom(String newNom) {
     Nom = newNom;
   }
@@ -24,9 +24,11 @@ class GlobalState extends ChangeNotifier {
   void updateApe(String newApe) {
     Ape = newApe;
   }
+
   List<Plato> pedidos = [];
 
   void agregarPedido(Plato pedido) {
+    pedidos.clear(); // Clear the list before adding a new pedido
     pedidos.add(pedido);
     notifyListeners();
   }
