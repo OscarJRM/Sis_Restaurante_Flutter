@@ -17,6 +17,13 @@ class Pedido {
     required this.numMesPid,
     required this.idEstPed,
   });
+
+  void cargarPedido() async{
+    final conn = await DatabaseConnection.openConnection();
+    final result = await conn.execute("SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1", parameters: ["1850464338"]);
+    List<Pedido> listaPedidos = cargarPedidos(result);
+    await conn.close();
+  }
 }
 
 List<Pedido> cargarPedidos(Result result) {

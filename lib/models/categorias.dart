@@ -12,16 +12,36 @@ class Categoria {
     required this.desCat,
   });
 
-}
- List<Categoria> cargarCategorias(Result result) {
-    return result.map((row) {
-      return Categoria(
-        idCat: row[0] as String,
-        nomCat: row[1] as String,
-        desCat: row[2] as String,
-      );
-    }).toList();
+  // Constructor vacío
+  Categoria.empty()
+      : idCat = '',
+        nomCat = '',
+        desCat = '';
+
+  Future<int> contarCategoria() async {
+    final conn = await DatabaseConnection.openConnection();
+    final result = await conn.execute("SELECT COUNT(*) from CATEGORIAS");
+    await conn.close();
+    return result[0][0] as int;
   }
+
+  void cargarCategoria() async {
+    final conn = await DatabaseConnection.openConnection();
+    final result = await conn.execute("SELECT * from CATEGORIAS");
+    List<Categoria> listaCategorias = cargarCategorias(result);
+    await conn.close();
+  }
+}
+
+List<Categoria> cargarCategorias(Result result) {
+  return result.map((row) {
+    return Categoria(
+      idCat: row[0] as String,
+      nomCat: row[1] as String,
+      desCat: row[2] as String,
+    );
+  }).toList();
+}
 
 void main() async {
   final conn = await DatabaseConnection.openConnection();

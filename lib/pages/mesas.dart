@@ -25,9 +25,11 @@ class _MesasState extends State<Mesas> {
     final conn = await DatabaseConnection.openConnection();
     final result = await conn.execute("SELECT * FROM MESAS where EST_MES=\$1",
         parameters: ["DISPONIBLE"]);
-    setState(() {
-      listaMesas = cargarMesas(result);
-    });
+    if (mounted) {
+      setState(() {
+        listaMesas = cargarMesas(result);
+      });
+    }
     await conn.close();
   }
 
