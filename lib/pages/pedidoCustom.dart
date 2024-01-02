@@ -50,6 +50,7 @@ class pedidoCustom extends StatelessWidget {
                   children: [
                     Text(
                       pedido.idEstPed == "PEN" ? "Pendiente" : pedido.idEstPed,
+                      
                       style: GoogleFonts.inter(
                           color: const Color(0xFF999999),
                           fontSize: 18,

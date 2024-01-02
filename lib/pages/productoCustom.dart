@@ -1,3 +1,4 @@
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,7 +35,8 @@ class _productoCustomState extends State<productoCustom> {
   }
 
   Future<bool> verificarProductoAgregado() async {
-    final globalState = Provider.of<GlobalState>(context, listen: false);
+    final globalState =
+        Provider.of<GlobalState>(context as BuildContext, listen: false);
     final conn = await DatabaseConnection.openConnection();
 
     final result = await conn.execute(
@@ -117,25 +119,34 @@ class _productoCustomState extends State<productoCustom> {
                         });
 
                         // Tu lógica para añadir al carrito
-                        final conn = await DatabaseConnection.openConnection();
-                        final result1 = await conn.execute(
-                          r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
-                          parameters: [
-                            globalState.idPed,
-                            widget.plato.idPro,
-                            "PEN",
-                            1.0
-                          ],
-                        );
+                        final cantidad = await _mostrarDialogoCantidad(context);
+                        if (cantidad != null && cantidad > 0) {
+                          // Marcar el producto como añadido al carrito
+                          setState(() {
+                            productoAgregado = true;
+                          });
+                          // Tu lógica para añadir al carrito
+                          final conn =
+                              await DatabaseConnection.openConnection();
+                          final result1 = await conn.execute(
+                            r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
+                            parameters: [
+                              globalState.idPed,
+                              widget.plato.idPro,
+                              "PEN",
+                              cantidad.toDouble(),
+                            ],
+                          );
 
-                        // Muestra la notificación en el SnackBar
-                        const snackBar = SnackBar(
-                          content: Text('Producto añadido al carrito'),
-                          backgroundColor: Color(0xFFE57734),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          // Mostrar la notificación en el SnackBar
+                          const snackBar = SnackBar(
+                            content: Text('Producto añadido al carrito'),
+                            backgroundColor: Color(0xFFE57734),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                       } else {
-                        // Muestra un mensaje o realiza alguna acción
+                        // Mostrar un mensaje si el producto ya está en el carrito
                         const snackBar1 = SnackBar(
                           content: Text('El producto ya está en el carrito'),
                           backgroundColor: Color(0xFFE57734),
@@ -312,3 +323,39 @@ class productoCustom extends StatelessWidget {
   }
 }
 */
+
+// Función para mostrar el AlertDialog y obtener la cantidad
+Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
+  int? cantidad;
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Ingrese la cantidad'),
+        content: TextField(
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            cantidad = int.tryParse(value);
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(cantidad);
+            },
+            child: Text('Aceptar'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return cantidad;
+}

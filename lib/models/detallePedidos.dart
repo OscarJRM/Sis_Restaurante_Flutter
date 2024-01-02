@@ -4,11 +4,13 @@ import '../BaseDatos/conexion.dart';
 class DetallePedido {
   int idPedPer;
   String idProPed;
+  String estProPed;
   String canProPed;
 
   DetallePedido({
     required this.idPedPer,
     required this.idProPed,
+    required this.estProPed,
     required this.canProPed,
   });
 }
@@ -16,10 +18,10 @@ class DetallePedido {
 List<DetallePedido> cargarDetallePedidos(Result result) {
   return result.map((row) {
     return DetallePedido(
-      idPedPer: row[0] as int,
-      idProPed: row[1] as String,
-      canProPed: row[2] as String
-    );
+        idPedPer: row[0] as int,
+        idProPed: row[1] as String,
+        estProPed: row[2] as String,
+        canProPed: row[3] as String);
   }).toList();
 }
 
@@ -35,7 +37,8 @@ void main() async {
 
   // Imprime la lista de mesas
   listaDetallePedido.forEach((detalle) {
-     print('  Detalle - ID: ${detalle.idPedPer}, Producto: ${detalle.idProPed}, Cantidad: ${detalle.canProPed}');
+    print(
+        '  Detalle - ID: ${detalle.idPedPer}, Producto: ${detalle.idProPed}, Cantidad: ${detalle.canProPed}');
   });
 
   // Cierra la conexión cuando hayas terminado de usarla

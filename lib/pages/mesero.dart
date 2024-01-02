@@ -6,7 +6,6 @@ import 'package:badges/badges.dart' as badges;
 class Mesero extends StatelessWidget {
   const Mesero({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -65,12 +64,6 @@ class Mesero extends StatelessWidget {
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back, color: Colors.white),
-          ),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Pestaña 1'),
-              Tab(text: 'Pestaña 2'),
-            ],
           ),
         ),
         body: Container(
