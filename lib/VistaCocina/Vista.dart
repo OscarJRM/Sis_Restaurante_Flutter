@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_restaurante/services/web_socket_client.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Pedido.dart';
 
-class Vista extends StatelessWidget {
+class Vista extends StatefulWidget {
+
+
+    
+  @override
+  State<Vista> createState() => _VistaState();
+}
+
+class _VistaState extends State<Vista> {
+   late WebSocketChannel webSocketClient;
+
+  @override
+  void initState() {
+    super.initState();
+    webSocketClient = IOWebSocketChannel.connect('ws://echo.websocket.org/');
+    webSocketClient.stream.listen((message) {
+      print('Nuevo mensaje desde el servidor: $message');
+      // Actualizar la interfaz de usuario de la cocina según sea necesario
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,3 +1,5 @@
+import "dart:io";
+
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
 import "package:sistema_restaurante/models/mesas.dart";
@@ -5,13 +7,33 @@ import "package:sistema_restaurante/pages/carrito.dart";
 import "package:sistema_restaurante/pages/carrito2.dart";
 import "package:sistema_restaurante/pages/mesas.dart";
 import "package:sistema_restaurante/pages/wArgumentos.dart";
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
 import 'Pedidos.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/models/platos.dart';
 
+class Carrito {
+  final WebSocketChannel webSocketClient;
+  Carrito({required this.webSocketClient});
+
+  Future<void> enviarMensaje() async {
+    final mensaje = "{'mensaje':'actualizar_lista'}";
+    //webSocketClient.send(mensaje);
+  }
+}
+
 class menuCarrito extends StatelessWidget {
-  const menuCarrito({super.key});
+  /*final TextEditingController _controller = TextEditingController();
+  final _channel = WebSocketChannel.connect(
+    Uri.parse('wss://echo.websocket.events'),
+  );
+
+     void _sendMessage() async {
+    webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
+  }*/
+  
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +43,15 @@ class menuCarrito extends StatelessWidget {
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 106, right: 20),
           child: FloatingActionButton(
-            onPressed: () {
+            onPressed: () async {
+              /*webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
+              _sendMessage();
+
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          Carrito2(listaPlatos: globalState.pedidos)));
+                          Carrito2(listaPlatos: globalState.pedidos)));*/
             },
             backgroundColor: const Color(0xFFE57734),
             child: const Stack(
@@ -48,6 +73,7 @@ class menuCarrito extends StatelessWidget {
           ),
           centerTitle: true,
           actions: [SizedBox(width: 20.0)],
+          
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);

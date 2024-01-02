@@ -119,10 +119,11 @@ class _productoCustomState extends State<productoCustom> {
                         // Tu lógica para añadir al carrito
                         final conn = await DatabaseConnection.openConnection();
                         final result1 = await conn.execute(
-                          r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3)',
+                          r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
                           parameters: [
                             globalState.idPed,
                             widget.plato.idPro,
+                            "PEN",
                             1.0
                           ],
                         );
