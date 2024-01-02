@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:postgres/postgres.dart';
 
 class ConexionDB {
-  // ignore: prefer_typing_uninitialized_variables
   late Connection _conn;
+
   Future<Connection?> connect() async {
     try {
-      return _conn = await Connection.open(
+      _conn = await Connection.open(
         Endpoint(
           host: 'restaurante-metodologias-agiles.postgres.database.azure.com',
           port: 5432,
@@ -16,13 +16,13 @@ class ConexionDB {
         ),
         settings: const ConnectionSettings(sslMode: SslMode.require),
       );
-    } on Exception {
+      return _conn;
+    } catch (e) {
       if (kDebugMode) {
-        print(Exception);
-        return null;
+        print('Error al conectar: $e');
       }
+      return null;
     }
-    return null;
   }
 
   Future<void> close() async {

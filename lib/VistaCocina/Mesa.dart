@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:postgres/postgres.dart';
 import '../BaseDatos/conexion.dart';
 
 class Mesa {
@@ -52,23 +51,22 @@ class _ListaMesasState extends State<ListaMesas> {
   }
 
   Future<void> cargarMesas() async {
-  final connection = await DatabaseConnection.openConnection();
-  final results = await connection.execute('SELECT * FROM MESAS');
+    final connection = await DatabaseConnection.openConnection();
+    final results = await connection.execute('SELECT * FROM MESAS');
 
-  final List<Mesa> mesasList = results.map((row) {
-    return Mesa(
-      numero: row[0].toString(),
-      estado: row[1].toString(),
-    );
-  }).toList();
+    final List<Mesa> mesasList = results.map((row) {
+      return Mesa(
+        numero: row[0].toString(),
+        estado: row[1].toString(),
+      );
+    }).toList();
 
-  setState(() {
-    mesas = mesasList;
-  });
+    setState(() {
+      mesas = mesasList;
+    });
 
-  await connection.close();
-}
-
+    await connection.close();
+  }
 
   @override
   Widget build(BuildContext context) {

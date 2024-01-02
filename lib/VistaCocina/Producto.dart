@@ -1,6 +1,6 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
+import 'package:sistema_restaurante/BaseDatos/conexion.dart';
+import 'package:sistema_restaurante/models/pedidos.dart';
 
 class Producto {
   String id;
@@ -9,15 +9,18 @@ class Producto {
   String descripcion;
   String imagenUrl;
   String estado;
+  int idPedidoPertenece;
+  int cantidad;
 
-  Producto({
-    required this.id,
-    required this.nombre,
-    required this.precio,
-    required this.descripcion,
-    required this.imagenUrl,
-    required this.estado,
-  });
+  Producto(
+      {required this.id,
+      required this.nombre,
+      required this.precio,
+      required this.descripcion,
+      required this.imagenUrl,
+      required this.estado,
+      required this.idPedidoPertenece,
+      required this.cantidad});
 }
 
 class ProductoWidget extends StatefulWidget {
@@ -30,7 +33,33 @@ class ProductoWidget extends StatefulWidget {
 }
 
 class _ProductoWidgetState extends State<ProductoWidget> {
-  String estado = 'Espera'; // Estado inicial
+  late String estado =
+      _estadoProducto(widget.producto.estado); // Estado inicial
+
+  String _estadoProducto(String est) {
+    if (est == "PEN") {
+      return "Espera";
+    } else if (est == "PRE") {
+      return "Preparando";
+    } else {
+      return "Listo";
+    }
+  }
+
+  Future<void> cambiarEstado(
+      String estadoProducto, int pedido, String producto) async {
+    try {
+      final connection = await DatabaseConnection.openConnection();
+      if (estadoProducto == "Preparando") {
+        await connection.execute(
+            "UPDATE detalle_pedidos SET est_pro_ped='PRE' WHERE id_ped_per= $pedido AND id_pro_ped='$producto'");
+      } else if (estadoProducto == "Listo") {
+        await connection.execute(
+            "UPDATE detalle_pedidos SET est_pro_ped='LIS' WHERE id_ped_per= $pedido AND id_pro_ped= '$producto';");
+      }
+    } catch (e) {}
+    //await connection.close();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +103,7 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.producto.nombre,
+                      '${widget.producto.nombre} (Cantidad: ${widget.producto.cantidad})',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -102,10 +131,14 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                   setState(() {
                     if (estado == 'Espera') {
                       estado = 'Preparando';
+                      cambiarEstado(estado, widget.producto.idPedidoPertenece,
+                          widget.producto.id.toString());
                     } else if (estado == 'Preparando') {
                       estado = 'Listo';
+                      cambiarEstado(estado, widget.producto.idPedidoPertenece,
+                          widget.producto.id);
                     } else {
-                      estado = 'Espera';
+                      estado = 'Listo';
                     }
 
                     // Aquí puedes almacenar el estado en una variable si es necesario
@@ -128,6 +161,7 @@ class ListaProductos extends StatefulWidget {
   ListaProductos({required this.productos});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ListaProductosState createState() => _ListaProductosState();
 }
 
