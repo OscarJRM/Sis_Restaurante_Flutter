@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/src/login.dart';
 import 'package:sistema_restaurante/models/platos.dart';
+import 'package:sistema_restaurante/VistaCocina/Vista.dart';
 
 void main() {
   runApp(
@@ -37,6 +38,7 @@ class MainApp extends StatelessWidget {
         '/mesas': (context) => menuMesas(),
         '/menu': (context) => Mesero(),
         '/carrito': (context) => menuCarrito(),
+        '/Vista': (context) => Vista(),
       },
     );
   }
