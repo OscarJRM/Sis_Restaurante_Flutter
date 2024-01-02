@@ -41,7 +41,8 @@ class _carritoState extends State<carrito> {
     });
     await conn.close();
   }
-   @override
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -50,15 +51,14 @@ class _carritoState extends State<carrito> {
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: 250,
+                mainAxisExtent: 270,
                 crossAxisCount: 1,
                 mainAxisSpacing: 23,
                 crossAxisSpacing: 24,
               ),
               itemCount: listaCarrito.length,
               itemBuilder: (context, index) {
-                return carritoCustom1(
-                    detallePedido: listaCarrito[index]);
+                return carritoCustom1(detallePedido: listaCarrito[index]);
               },
             )
           : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se obtienen los datos

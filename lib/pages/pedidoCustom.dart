@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sistema_restaurante/models/platos.dart';
 import 'package:sistema_restaurante/models/pedidos.dart';
 import 'package:sistema_restaurante/pages/MenuPedidos2.dart';
+import 'package:sistema_restaurante/pages/mesero.dart';
 import 'package:sistema_restaurante/pages/wArgumentos.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
@@ -64,7 +65,10 @@ class pedidoCustom extends StatelessWidget {
                             globalState.updateIdPed(pedido.idPed);
                             print(globalState.idPed);
                             //Navigator.pushNamed(context, '/menu');
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => MenuPedidos2()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Mesero()));
                           },
                           child: Text("Ver"),
                           style: ButtonStyle(
