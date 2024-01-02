@@ -53,13 +53,19 @@ class _LoginState extends State<Login> {
         setState(() {
           _emailError = ' ';
         });
+
         // ignore: use_build_context_synchronously
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => menuPedidos1(result[0][0] as String,
-                  result[0][1] as String, result[0][2] as String)),
-        );
+        if (result[0][5] == 'COCINA') {
+          Navigator.pushNamed(context, '/Vista');
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => menuPedidos1(result[0][0] as String,
+                    result[0][1] as String, result[0][2] as String)),
+          );
+        }
+
         return true;
       } else {
         setState(() {
