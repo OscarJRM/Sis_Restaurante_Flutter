@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../BaseDatos/conexion.dart';
 import 'Producto.dart';
 
@@ -28,6 +29,22 @@ class PedidoWidget extends StatelessWidget {
   final Pedido pedido;
 
   const PedidoWidget({Key? key, required this.pedido}) : super(key: key);
+
+  String _estadoPedido(String estado) {
+    if (estado == 'PEN') {
+      return 'Pendiente';
+    } else if (estado == 'PRE') {
+      return 'Preparando';
+    } else {
+      return 'Listo';
+    }
+  }
+
+  String _fechaHoraPedido(DateTime fechaHora) {
+    String formattedDateTime =
+        DateFormat('HH:mm:ss dd-MM-yyyy').format(fechaHora);
+    return formattedDateTime;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +79,7 @@ class PedidoWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Fecha y Hora: ${pedido.fechaHora}',
+                  'Fecha y Hora: ${_fechaHoraPedido(pedido.fechaHora)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
@@ -70,11 +87,15 @@ class PedidoWidget extends StatelessWidget {
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  'Cédula Empleado: ${pedido.cedulaEmpleado}',
+                  'C.I. Mesero: ${pedido.cedulaEmpleado}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
                   'Número de Mesa: ${pedido.numeroMesa}',
+                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                ),
+                Text(
+                  'Estado: ${_estadoPedido(pedido.idEstadoPedido)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
@@ -113,18 +134,18 @@ class PedidoWidget extends StatelessWidget {
   Future<List<Producto>> cargarProductos(int pedidoId) async {
     final connection = await DatabaseConnection.openConnection();
     final results = await connection.execute(
-        'SELECT p.* FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = $pedidoId');
+        'SELECT p.*, dp.est_pro_ped, dp.id_ped_per, dp.can_pro_ped FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = $pedidoId');
 
     final List<Producto> productosList = results.map((row) {
       return Producto(
-        id: row[0].toString(),
-        nombre: row[1].toString(),
-        precio: double.parse(row[2].toString()),
-        descripcion: row[3].toString(),
-        imagenUrl: row[4].toString(),
-        // Agregar estado si es necesario
-        estado: row[5].toString(),
-      );
+          id: row[0].toString(),
+          nombre: row[1].toString(),
+          precio: double.parse(row[2].toString()),
+          descripcion: row[3].toString(),
+          imagenUrl: row[4].toString(),
+          estado: row[6].toString(),
+          idPedidoPertenece: int.parse(row[7].toString()),
+          cantidad: int.parse(row[8].toString()));
     }).toList();
 
     await connection.close();
@@ -191,7 +212,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
 class ListaProductosPedido extends StatefulWidget {
   final Pedido pedido;
 
-  const ListaProductosPedido({Key? key, required this.pedido}) : super(key: key);
+  const ListaProductosPedido({Key? key, required this.pedido})
+      : super(key: key);
 
   @override
   _ListaProductosPedidoState createState() => _ListaProductosPedidoState();
@@ -209,18 +231,18 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
   Future<void> cargarProductosPedido() async {
     final connection = await DatabaseConnection.openConnection();
     final results = await connection.execute(
-        'SELECT p.* FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = ${widget.pedido.id}');
+        'SELECT p.*, dp.est_pro_ped, dp.id_ped_per, dp.can_pro_ped FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = ${widget.pedido.id}');
 
     final List<Producto> productosList = results.map((row) {
       return Producto(
-        id: row[0].toString(),
-        nombre: row[1].toString(),
-        precio: double.parse(row[2].toString()),
-        descripcion: row[3].toString(),
-        imagenUrl: row[4].toString(),
-        // Agregar estado si es necesario
-        estado: row[5].toString(),
-      );
+          id: row[0].toString(),
+          nombre: row[1].toString(),
+          precio: double.parse(row[2].toString()),
+          descripcion: row[3].toString(),
+          imagenUrl: row[4].toString(),
+          estado: row[6].toString(),
+          idPedidoPertenece: int.parse(row[7].toString()),
+          cantidad: int.parse(row[8].toString()));
     }).toList();
 
     setState(() {

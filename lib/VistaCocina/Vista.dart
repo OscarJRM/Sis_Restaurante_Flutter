@@ -1,12 +1,15 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'Pedido.dart';
 
 class Vista extends StatelessWidget {
+  const Vista({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vista de Pedidos'),
+        title: const Text('Vista de Pedidos'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -29,7 +32,7 @@ class Vista extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Productos del Pedido #${pedido.id}'),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             child: ListaProductosPedido(pedido: pedido),
           ),
@@ -38,7 +41,7 @@ class Vista extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cerrar'),
+              child: const Text('Cerrar'),
             ),
           ],
         );
@@ -48,7 +51,7 @@ class Vista extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: Vista(),
   ));
 }

@@ -12,7 +12,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => GlobalState(),
-      child: MainApp(),
+      child: const MainApp(),
     ),
   );
 }
@@ -32,10 +32,10 @@ class MainApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => Login(),
-        '/mesas': (context) => menuMesas(),
-        '/menu': (context) => Mesero(),
-        '/carrito': (context) => menuCarrito(),
+        '/': (context) => const Login(),
+        '/mesas': (context) => const menuMesas(),
+        '/menu': (context) => const Mesero(),
+        '/carrito': (context) => const menuCarrito(),
         '/Vista': (context) => Vista(),
       },
     );
