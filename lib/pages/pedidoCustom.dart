@@ -49,8 +49,7 @@ class pedidoCustom extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      pedido.idEstPed == "PEN" ? "Pendiente" : pedido.idEstPed,
-                      
+                      _obtenerTextoEstado(pedido.idEstPed),
                       style: GoogleFonts.inter(
                           color: const Color(0xFF999999),
                           fontSize: 18,
@@ -110,5 +109,17 @@ class pedidoCustom extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _obtenerTextoEstado(String idEstPed) {
+  if (idEstPed == "PEN") {
+    return "Pendiente";
+  } else if (idEstPed == "PRE") {
+    return "Preparando";
+  } else if (idEstPed == "LIS") {
+    return "Listo✨";
+  } else {
+    return "Desconocido";
   }
 }

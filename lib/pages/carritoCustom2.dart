@@ -112,6 +112,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           // También puedes actualizar cualquier otro dato necesario
                         });
                       }
+                      
                     }
                   },
                   child: Container(
@@ -191,6 +192,10 @@ Future<double?> _mostrarDialogoCantidad(
           controller: TextEditingController(text: cantidadActual.toString()),
           onChanged: (value) {
             nuevaCantidad = double.tryParse(value);
+            if (nuevaCantidad != null) {
+              // Validación para asegurar que la cantidad sea positiva
+              nuevaCantidad = nuevaCantidad! > 0 ? nuevaCantidad : null;
+            }
           },
         ),
         actions: <Widget>[
@@ -202,7 +207,17 @@ Future<double?> _mostrarDialogoCantidad(
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(nuevaCantidad);
+              if (nuevaCantidad != null) {
+                Navigator.of(context).pop(nuevaCantidad);
+              } else {
+                // Muestra un mensaje de error si la cantidad no es válida
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('La cantidad debe ser mayor que 0'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: Text('Aceptar'),
           ),
