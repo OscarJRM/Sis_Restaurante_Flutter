@@ -67,6 +67,64 @@ class _carritoCustom2State extends State<carritoCustom2> {
                   "Cantidad: ${widget.detallePedido.canProPed}",
                   style: GoogleFonts.inter(color: Colors.white, fontSize: 18),
                 ),
+                SizedBox(width: 10),
+                // Nuevo botón para editar la cantidad
+                GestureDetector(
+                  onTap: () async {
+                    double cantidad =
+                        double.parse(widget.detallePedido.canProPed.toString());
+                    // Mostrar un cuadro de diálogo para editar la cantidad
+                    final nuevaCantidad =
+                        await _mostrarDialogoCantidad(context, cantidad);
+
+                    if (nuevaCantidad != null) {
+                      setState(() {
+                        cantidad = nuevaCantidad;
+                      });
+
+                      // Aquí puedes actualizar la cantidad en la base de datos si es necesario
+                      if (nuevaCantidad != null) {
+                        // Actualiza la cantidad en la base de datos
+                        final conn = await DatabaseConnection.openConnection();
+                        await conn.execute(
+                          'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1 WHERE ID_PED_PER = \$2 AND ID_PRO_PED = \$3',
+                          parameters: [
+                            nuevaCantidad.toString(),
+                            globalState.idPed,
+                            widget.plato.idPro
+                          ],
+                        );
+                        await conn.close();
+
+                        // Recarga la lista de detalles del pedido
+                        final conn2 = await DatabaseConnection.openConnection();
+                        final result = await conn2.execute(
+                            "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
+                            parameters: [globalState.idPed]);
+                        List<DetallePedido> listaDetallePedido =
+                            cargarDetallePedidos(result);
+
+                        // Actualiza el estado para reflejar la nueva información
+                        setState(() {
+                          // Actualiza widget.detallePedido con la nueva cantidad
+                          widget.detallePedido.canProPed =
+                              nuevaCantidad.toString();
+                          // También puedes actualizar cualquier otro dato necesario
+                        });
+                      }
+                    }
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 30,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFF4CAF50),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    child: const Center(
+                      child: Icon(Icons.edit, color: Colors.white, size: 20.0),
+                    ),
+                  ),
+                ),
               ],
             ),
             Row(
@@ -116,4 +174,42 @@ class _carritoCustom2State extends State<carritoCustom2> {
       ),
     );
   }
+}
+
+// Función para mostrar el AlertDialog y obtener la cantidad
+Future<double?> _mostrarDialogoCantidad(
+    BuildContext context, double cantidadActual) async {
+  double? nuevaCantidad;
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Editar Cantidad'),
+        content: TextField(
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          controller: TextEditingController(text: cantidadActual.toString()),
+          onChanged: (value) {
+            nuevaCantidad = double.tryParse(value);
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(nuevaCantidad);
+            },
+            child: Text('Aceptar'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return nuevaCantidad;
 }
