@@ -24,7 +24,12 @@ class Carrito {
   }
 }
 
-class menuCarrito extends StatelessWidget {
+class menuCarrito extends StatefulWidget {
+  @override
+  State<menuCarrito> createState() => _menuCarritoState();
+}
+
+class _menuCarritoState extends State<menuCarrito> {
   /*final TextEditingController _controller = TextEditingController();
   final _channel = WebSocketChannel.connect(
     Uri.parse('wss://echo.websocket.events'),
@@ -33,18 +38,16 @@ class menuCarrito extends StatelessWidget {
      void _sendMessage() async {
     webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
   }*/
-  
-
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
 
     return Scaffold(
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 106, right: 20),
-          child: FloatingActionButton(
-            onPressed: () async {
-              /*webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 106, right: 20),
+        child: FloatingActionButton(
+          onPressed: () async {
+            /*webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
               _sendMessage();
 
               Navigator.push(
@@ -52,48 +55,46 @@ class menuCarrito extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) =>
                           Carrito2(listaPlatos: globalState.pedidos)));*/
+          },
+          backgroundColor: const Color(0xFFE57734),
+          child: const Stack(
+            children: [
+              SizedBox(
+                height: 35,
+                width: 35,
+                child: Icon(FeatherIcons.send, color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      ),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 26, 27, 29),
+        title: Text(
+          "Carrito",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        actions: [SizedBox(width: 20.0)],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
             },
-            backgroundColor: const Color(0xFFE57734),
-            child: const Stack(
-              children: [
-                SizedBox(
-                  height: 35,
-                  width: 35,
-                  child: Icon(FeatherIcons.send, color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-        ),
-        appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 26, 27, 29),
-          title: Text(
-            "Carrito",
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          actions: [SizedBox(width: 20.0)],
-          
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back, color: Colors.white)),
-        ),
-        body:
-            carrito() /*Carrito2(listaPlatos: globalState.pedidos)const Padding(
+            icon: Icon(Icons.arrow_back, color: Colors.white)),
+      ),
+      body: const Padding(
         padding: EdgeInsets.only(top: 8, right: 10, left: 10, bottom: 44),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
                 padding: EdgeInsets.only(top: 44),
-                child: Carrito2(),
+                child: carrito(),
               )
             ],
           ),
         ),
-      ),*/
-        );
+      ),
+    );
   }
 }
