@@ -10,6 +10,7 @@ import "package:sistema_restaurante/pages/wArgumentos.dart";
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'Pedidos.dart';
+import '../BaseDatos/conexion.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/models/platos.dart';
@@ -47,11 +48,26 @@ class _menuCarritoState extends State<menuCarrito> {
         padding: const EdgeInsets.only(bottom: 106, right: 20),
         child: FloatingActionButton(
           onPressed: () async {
-            /*webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
-              _sendMessage();
+            final conn = await DatabaseConnection.openConnection();
 
-              Navigator.push(
-                  context,
+            final result2 = await conn.execute(
+              r'UPDATE MAESTRO_PEDIDOS SET ID_EST_PED = $1 WHERE id_ped = $2',
+              parameters: ["PEN", globalState.idPed],
+            );
+            await conn.close();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Estado del pedido actualizado a "PEN"'),
+                backgroundColor: Colors
+                    .green, // Puedes ajustar el color según tus preferencias
+              ),
+            );
+            /*webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
+                _sendMessage();
+
+                Navigator.push(
+                    context,
                   MaterialPageRoute(
                       builder: (context) =>
                           Carrito2(listaPlatos: globalState.pedidos)));*/

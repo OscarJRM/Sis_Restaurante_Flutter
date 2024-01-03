@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -134,7 +133,7 @@ class _productoCustomState extends State<productoCustom> {
                               globalState.idPed,
                               widget.plato.idPro,
                               "PEN",
-                              cantidad.toDouble(),
+                              cantidad,
                             ],
                           );
 
@@ -337,6 +336,10 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
           keyboardType: TextInputType.number,
           onChanged: (value) {
             cantidad = int.tryParse(value);
+            if (cantidad != null) {
+              // Validación para asegurarte de que la cantidad sea mayor a 0
+              cantidad = cantidad! > 0 ? cantidad : null;
+            }
           },
         ),
         actions: <Widget>[
@@ -348,7 +351,17 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(cantidad);
+              if (cantidad != null) {
+                Navigator.of(context).pop(cantidad);
+              } else {
+                // Muestra un mensaje de error si la cantidad no es válida
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('La cantidad debe ser mayor que 0'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: Text('Aceptar'),
           ),

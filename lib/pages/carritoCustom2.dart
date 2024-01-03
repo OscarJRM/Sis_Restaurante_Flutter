@@ -52,7 +52,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
               children: [
                 Expanded(
                   child: Text(
-                    "Produto: ${widget.plato.nomPro}",
+                    "${widget.plato.nomPro}",
                     style: GoogleFonts.inter(
                         color: Colors.white,
                         fontSize: 18,
@@ -71,19 +71,20 @@ class _carritoCustom2State extends State<carritoCustom2> {
                 // Nuevo botón para editar la cantidad
                 GestureDetector(
                   onTap: () async {
-                    double cantidad =
-                        double.parse(widget.detallePedido.canProPed.toString());
-                    // Mostrar un cuadro de diálogo para editar la cantidad
-                    final nuevaCantidad =
-                        await _mostrarDialogoCantidad(context, cantidad);
+                    int cantidad =
+                        int.parse(widget.detallePedido.canProPed.toString());
+                    debugPrint(cantidad.toString());
+                    final String estadoPedido =
+                        await obtenerEstadoPedido(context);
 
-                    if (nuevaCantidad != null) {
-                      setState(() {
-                        cantidad = nuevaCantidad;
-                      });
+                    if (estadoPedido == "PEN" ||
+                        estadoPedido == "LIS" ||
+                        estadoPedido == "PRE") {
+                      // Si el estado es "PEN", "LIS" o "PRE", mostrar el diálogo solo si la nueva cantidad es mayor o igual a la actual
+                      final nuevaCantidad =
+                          await _mostrarDialogoCantidad(context, cantidad);
 
-                      // Aquí puedes actualizar la cantidad en la base de datos si es necesario
-                      if (nuevaCantidad != null) {
+                      if (nuevaCantidad != null && nuevaCantidad >= cantidad) {
                         // Actualiza la cantidad en la base de datos
                         final conn = await DatabaseConnection.openConnection();
                         await conn.execute(
@@ -91,7 +92,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           parameters: [
                             nuevaCantidad.toString(),
                             globalState.idPed,
-                            widget.plato.idPro
+                            widget.plato.idPro,
                           ],
                         );
                         await conn.close();
@@ -99,20 +100,37 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         // Recarga la lista de detalles del pedido
                         final conn2 = await DatabaseConnection.openConnection();
                         final result = await conn2.execute(
-                            "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
-                            parameters: [globalState.idPed]);
+                          "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
+                          parameters: [globalState.idPed],
+                        );
                         List<DetallePedido> listaDetallePedido =
                             cargarDetallePedidos(result);
 
                         // Actualiza el estado para reflejar la nueva información
                         setState(() {
-                          // Actualiza widget.detallePedido con la nueva cantidad
                           widget.detallePedido.canProPed =
                               nuevaCantidad.toString();
-                          // También puedes actualizar cualquier otro dato necesario
                         });
+                      } else if (nuevaCantidad != null &&
+                          nuevaCantidad < cantidad) {
+                        // Muestra un mensaje indicando que la nueva cantidad debe ser mayor o igual a la actual
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'La nueva cantidad debe ser mayor o igual a la actual'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
-                      
+                    } else {
+                      // Muestra un mensaje indicando que no se puede editar la cantidad en un estado diferente a "PEN", "LIS" o "PRE"
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'No se puede editar la cantidad en un estado diferente a "PEN", "LIS" o "PRE"'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   },
                   child: Container(
@@ -144,16 +162,33 @@ class _carritoCustom2State extends State<carritoCustom2> {
                 Builder(builder: (innercontext) {
                   return GestureDetector(
                     onTap: () async {
-                      final conn = await DatabaseConnection.openConnection();
+                      final String estadoPedido =
+                          await obtenerEstadoPedido(context);
+                      debugPrint(estadoPedido);
 
-                      // Realiza la eliminación del producto de DETALLE_PEDIDOS
-                      final result = await conn.execute(
-                        'DELETE FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
-                        parameters: [globalState.idPed, widget.plato.idPro],
-                      );
+                      // Comprueba si el estado del pedido permite la eliminación del producto
+                      if (estadoPedido == "PEN" ||
+                          estadoPedido == "LIS" ||
+                          estadoPedido == "PRE") {
+                        // Muestra un mensaje indicando que no se puede borrar un producto en un pedido enviado
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'No se puede borrar un producto en un pedido enviado'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } else {
+                        // Realiza la eliminación del producto de DETALLE_PEDIDOS
+                        final conn = await DatabaseConnection.openConnection();
+                        final result = await conn.execute(
+                          'DELETE FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
+                          parameters: [globalState.idPed, widget.plato.idPro],
+                        );
+                        await conn.close();
 
-                      await conn.close();
-                      Navigator.pushReplacementNamed(context, '/carrito');
+                        Navigator.pushReplacementNamed(context, '/carrito');
+                      }
                     },
                     child: Container(
                       height: 30,
@@ -178,9 +213,9 @@ class _carritoCustom2State extends State<carritoCustom2> {
 }
 
 // Función para mostrar el AlertDialog y obtener la cantidad
-Future<double?> _mostrarDialogoCantidad(
-    BuildContext context, double cantidadActual) async {
-  double? nuevaCantidad;
+Future<int?> _mostrarDialogoCantidad(
+    BuildContext context, int cantidadActual) async {
+  int? nuevaCantidad;
 
   await showDialog(
     context: context,
@@ -188,10 +223,10 @@ Future<double?> _mostrarDialogoCantidad(
       return AlertDialog(
         title: Text('Editar Cantidad'),
         content: TextField(
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: TextInputType.numberWithOptions(decimal: false),
           controller: TextEditingController(text: cantidadActual.toString()),
           onChanged: (value) {
-            nuevaCantidad = double.tryParse(value);
+            nuevaCantidad = int.tryParse(value);
             if (nuevaCantidad != null) {
               // Validación para asegurar que la cantidad sea positiva
               nuevaCantidad = nuevaCantidad! > 0 ? nuevaCantidad : null;
@@ -227,4 +262,18 @@ Future<double?> _mostrarDialogoCantidad(
   );
 
   return nuevaCantidad;
+}
+
+Future<String> obtenerEstadoPedido(BuildContext context) async {
+  final conn = await DatabaseConnection.openConnection();
+  final globalState = Provider.of<GlobalState>(context, listen: false);
+  final result = await conn.execute(
+    'SELECT ID_EST_PED FROM MAESTRO_PEDIDOS WHERE ID_PED = \$1',
+    parameters: [globalState.idPed],
+  );
+
+  await conn.close();
+
+  // Devuelve el estado del pedido o un valor predeterminado si no se encuentra
+  return result.isNotEmpty ? result[0][0] as String : '';
 }

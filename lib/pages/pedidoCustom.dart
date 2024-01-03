@@ -114,11 +114,13 @@ class pedidoCustom extends StatelessWidget {
 
 String _obtenerTextoEstado(String idEstPed) {
   if (idEstPed == "PEN") {
-    return "Pendiente";
+    return "Enviado";
   } else if (idEstPed == "PRE") {
-    return "Preparando";
+    return "Preparando🔥";
   } else if (idEstPed == "LIS") {
     return "Listo✨";
+  } else if (idEstPed == "ENV") {
+    return "Pendiente";
   } else {
     return "Desconocido";
   }

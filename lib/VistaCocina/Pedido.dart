@@ -31,7 +31,7 @@ class PedidoWidget extends StatelessWidget {
   const PedidoWidget({Key? key, required this.pedido}) : super(key: key);
 
   String _estadoPedido(String estado) {
-    if (estado == 'PEN') {
+    if (estado == 'PEN' || estado == 'ENV') {
       return 'Pendiente';
     } else if (estado == 'PRE') {
       return 'Preparando';
@@ -82,10 +82,10 @@ class PedidoWidget extends StatelessWidget {
                   'Fecha y Hora: ${_fechaHoraPedido(pedido.fechaHora)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
-                Text(
+                /*Text(
                   'Total: \$${pedido.total.toString()}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
-                ),
+                ),*/
                 Text(
                   'C.I. Mesero: ${pedido.cedulaEmpleado}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
