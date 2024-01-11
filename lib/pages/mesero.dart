@@ -1,6 +1,9 @@
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
+import 'package:postgres/postgres.dart';
 import 'productosMesero.dart';
+import '../BaseDatos/conexion.dart';
+import '../models/platos.dart';
 import 'package:badges/badges.dart' as badges;
 
 class Mesero extends StatelessWidget {
@@ -45,7 +48,7 @@ class Mesero extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
-          actions: const [
+          actions: [
             badges.Badge(
               badgeContent: Text(
                 '',
@@ -58,6 +61,12 @@ class Mesero extends StatelessWidget {
               ),
             ),
             SizedBox(width: 20.0),
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.white),
+              onPressed: () {
+                showSearch(context: context, delegate: ProductSearch());
+              },
+            ),
           ],
           leading: IconButton(
             onPressed: () {
@@ -98,5 +107,89 @@ class Mesero extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// Nuevo widget para manejar la búsqueda de productos
+class ProductSearch extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder<List<Plato>>(
+      future: buscarProductos(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          List<Plato> productos = snapshot.data ??
+              []; // Agregamos el ?? para manejar el caso de null
+          return ListView.builder(
+            itemCount: productos.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(productos[index].nomPro,
+                    style: TextStyle(color: Colors.white)),
+                subtitle: Text('Precio: ${productos[index].preUni}',
+                    style: TextStyle(color: Colors.white)),
+                // Puedes personalizar la apariencia de cada resultado
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // Implementa sugerencias mientras el usuario escribe
+    return Center(
+      child: Text('Escribe para buscar productos'),
+    );
+  }
+}
+
+Future<List<Plato>> buscarProductos(String query) async {
+  final conn = await DatabaseConnection.openConnection();
+
+  try {
+    final result = await conn.execute(
+        Sql.named("SELECT * FROM Productos WHERE lower(Nom_pro) LIKE @query"),
+        parameters: {'query': '%${query.toLowerCase()}%'});
+    print('Resultados: $result');
+
+    // Llena la lista de platos con los resultados obtenidos
+    List<Plato> listaPlatos = Platos(result);
+
+    return listaPlatos;
+  } catch (e) {
+    print('Error en la búsqueda de productos: $e');
+    return []; // Devuelve una lista vacía en caso de error
+  } finally {
+    // Cierra la conexión cuando hayas terminado de usarla
+    await conn.close();
   }
 }

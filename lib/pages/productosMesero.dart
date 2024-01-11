@@ -15,6 +15,7 @@ class ProductosMesero extends StatefulWidget {
 
 class _ProductosMeseroState extends State<ProductosMesero> {
   late List<Plato> listaPlatos = [];
+  late List<Plato> listaFiltrada;
 
   @override
   void initState() {
@@ -26,14 +27,24 @@ class _ProductosMeseroState extends State<ProductosMesero> {
     final conn = await DatabaseConnection.openConnection();
     final result = await conn.execute("SELECT * from Productos");
 
-    // Verifica si el widget está montado antes de llamar a setState
     if (mounted) {
       setState(() {
         listaPlatos = Platos(result);
+        listaFiltrada =
+            listaPlatos; // Inicialmente, la lista filtrada es igual a la lista completa
       });
     }
 
     await conn.close();
+  }
+
+  void filtrarProductos(String query) {
+    setState(() {
+      listaFiltrada = listaPlatos
+          .where((plato) =>
+              plato.nomPro.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
