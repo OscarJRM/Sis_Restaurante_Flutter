@@ -77,10 +77,50 @@ class _carritoCustom2State extends State<carritoCustom2> {
                     final String estadoPedido =
                         await obtenerEstadoPedido(context);
 
-                    if (estadoPedido == "PEN" ||
-                        estadoPedido == "LIS" ||
-                        estadoPedido == "PRE") {
-                      // Si el estado es "PEN", "LIS" o "PRE", mostrar el diálogo solo si la nueva cantidad es mayor o igual a la actual
+                    // Verifica si el estado es "ENV" para permitir editar la cantidad
+                    if (estadoPedido == "ENV") {
+                      final nuevaCantidad =
+                          await _mostrarDialogoCantidad(context, cantidad);
+
+                      // Verifica si la nueva cantidad es mayor o igual a 1
+                      if (nuevaCantidad != null && nuevaCantidad >= 1) {
+                        // Actualiza la cantidad en la base de datos
+                        final conn = await DatabaseConnection.openConnection();
+                        await conn.execute(
+                          'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1 WHERE ID_PED_PER = \$2 AND ID_PRO_PED = \$3',
+                          parameters: [
+                            nuevaCantidad.toString(),
+                            globalState.idPed,
+                            widget.plato.idPro,
+                          ],
+                        );
+                        await conn.close();
+
+                        // Recarga la lista de detalles del pedido
+                        final conn2 = await DatabaseConnection.openConnection();
+                        final result = await conn2.execute(
+                          "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
+                          parameters: [globalState.idPed],
+                        );
+                        List<DetallePedido> listaDetallePedido =
+                            cargarDetallePedidos(result);
+
+                        // Actualiza el estado para reflejar la nueva información
+                        setState(() {
+                          widget.detallePedido.canProPed =
+                              nuevaCantidad.toString();
+                        });
+                      } else if (nuevaCantidad != null && nuevaCantidad < 1) {
+                        // Muestra un mensaje indicando que la cantidad no puede ser menor a 1
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('La cantidad no puede ser menor a 1'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } else {
+                      // Si el estado no es "ENV", mostrar el cuadro de diálogo solo si la nueva cantidad es mayor o igual a la actual
                       final nuevaCantidad =
                           await _mostrarDialogoCantidad(context, cantidad);
 
@@ -122,15 +162,6 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           ),
                         );
                       }
-                    } else {
-                      // Muestra un mensaje indicando que no se puede editar la cantidad en un estado diferente a "PEN", "LIS" o "PRE"
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              'No se puede editar la cantidad en un estado diferente a "PEN", "LIS" o "PRE"'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
                     }
                   },
                   child: Container(

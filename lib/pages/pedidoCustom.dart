@@ -18,7 +18,7 @@ class pedidoCustom extends StatelessWidget {
 
     return Container(
       decoration: const BoxDecoration(
-          boxShadow: [
+          boxShadow: [  
             BoxShadow(color: Colors.black, offset: Offset(0, 4), blurRadius: 20)
           ],
           color: Color(0xFF212325),
