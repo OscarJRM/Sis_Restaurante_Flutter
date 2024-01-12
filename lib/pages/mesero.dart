@@ -3,8 +3,10 @@ import "package:flutter/material.dart";
 import 'package:postgres/postgres.dart';
 import 'productosMesero.dart';
 import '../BaseDatos/conexion.dart';
+import 'package:provider/provider.dart';
 import '../models/platos.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class Mesero extends StatelessWidget {
   const Mesero({super.key});
@@ -112,6 +114,7 @@ class Mesero extends StatelessWidget {
 
 // Nuevo widget para manejar la búsqueda de productos
 class ProductSearch extends SearchDelegate<String> {
+  
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -144,8 +147,7 @@ class ProductSearch extends SearchDelegate<String> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          List<Plato> productos = snapshot.data ??
-              []; // Agregamos el ?? para manejar el caso de null
+          List<Plato> productos = snapshot.data ?? [];
           return ListView.builder(
             itemCount: productos.length,
             itemBuilder: (context, index) {
@@ -154,7 +156,13 @@ class ProductSearch extends SearchDelegate<String> {
                     style: TextStyle(color: Colors.white)),
                 subtitle: Text('Precio: ${productos[index].preUni}',
                     style: TextStyle(color: Colors.white)),
-                // Puedes personalizar la apariencia de cada resultado
+                // Añadir un botón para agregar al carrito
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    _agregarAlCarrito(context, productos[index]);
+                  },
+                  child: Text('Añadir'),
+                ),
               );
             },
           );
@@ -169,6 +177,34 @@ class ProductSearch extends SearchDelegate<String> {
     return Center(
       child: Text('Escribe para buscar productos'),
     );
+  }
+
+  // Función para agregar el producto al carrito
+  Future<void> _agregarAlCarrito(BuildContext context, Plato producto) async {
+    final cantidad = await _mostrarDialogoCantidad(context);
+
+    if (cantidad != null && cantidad > 0) {
+      // Lógica para agregar al carrito
+      final conn = await DatabaseConnection.instance.openConnection();
+      final globalState = Provider.of<GlobalState>(context, listen: false);
+
+      final result = await conn.execute(
+        r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
+        parameters: [
+          globalState.idPed,
+          producto.idPro,
+          "PEN",
+          cantidad,
+        ],
+      );
+
+      // Mostrar notificación en el SnackBar
+      final snackBar = SnackBar(
+        content: Text('Producto añadido al carrito'),
+        backgroundColor: Color(0xFFE57734),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 }
 
@@ -193,3 +229,54 @@ Future<List<Plato>> buscarProductos(String query) async {
     await conn.close();
   }
 }
+
+// Función para mostrar el AlertDialog y obtener la cantidad
+Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
+  int? cantidad;
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Ingrese la cantidad'),
+        content: TextField(
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            cantidad = int.tryParse(value);
+            if (cantidad != null) {
+              // Validación para asegurarte de que la cantidad sea mayor a 0
+              cantidad = cantidad! > 0 ? cantidad : null;
+            }
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (cantidad != null) {
+                Navigator.of(context).pop(cantidad);
+              } else {
+                // Muestra un mensaje de error si la cantidad no es válida
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('La cantidad debe ser mayor que 0'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: Text('Aceptar'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return cantidad;
+}
+
