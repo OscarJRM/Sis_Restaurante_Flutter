@@ -48,7 +48,7 @@ class _menuCarritoState extends State<menuCarrito> {
         padding: const EdgeInsets.only(bottom: 106, right: 20),
         child: FloatingActionButton(
           onPressed: () async {
-            final conn = await DatabaseConnection.openConnection();
+            final conn = await DatabaseConnection.instance.openConnection();
 
             final result2 = await conn.execute(
               r'UPDATE MAESTRO_PEDIDOS SET ID_EST_PED = $1 WHERE id_ped = $2',

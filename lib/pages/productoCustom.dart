@@ -18,11 +18,14 @@ class productoCustom extends StatefulWidget {
 class _productoCustomState extends State<productoCustom> {
   bool productoAgregado = false;
   Color buttonColor = Color(0xFFE57734);
+    late DatabaseConnection conn;
+
   
 
   @override
   void initState() {
     super.initState();
+    
 // We can't use async directly in initState, so we use a Future.delayed to schedule the task.
     Future.delayed(Duration.zero, () async {
       // Llamada a la función para verificar el estado del producto
@@ -38,7 +41,7 @@ class _productoCustomState extends State<productoCustom> {
   Future<bool> verificarProductoAgregado() async {
     final globalState =
         Provider.of<GlobalState>(context as BuildContext, listen: false);
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
 
     final result = await conn.execute(
         'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
@@ -128,7 +131,7 @@ class _productoCustomState extends State<productoCustom> {
                           });
                           // Tu lógica para añadir al carrito
                           final conn =
-                              await DatabaseConnection.openConnection();
+                              await DatabaseConnection.instance.openConnection();
                           final result1 = await conn.execute(
                             r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
                             parameters: [

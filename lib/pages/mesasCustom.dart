@@ -64,7 +64,7 @@ class mesasCustom extends StatelessWidget {
                                             onPressed: () async {
                                               final conn =
                                                   await DatabaseConnection
-                                                      .openConnection();
+                                                      .instance.openConnection();
                                               final result2 =
                                                   await conn.execute(
                                                 r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES (CURRENT_TIMESTAMP, 0.1, $1, $2,$3)',

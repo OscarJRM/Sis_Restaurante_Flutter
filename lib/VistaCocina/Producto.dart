@@ -49,7 +49,7 @@ class _ProductoWidgetState extends State<ProductoWidget> {
   Future<void> cambiarEstado(
       String estadoProducto, int pedido, String producto) async {
     try {
-      final connection = await DatabaseConnection.openConnection();
+      final connection = await DatabaseConnection.instance.openConnection();
       if (estadoProducto == "Preparando") {
         await connection.execute(
             "UPDATE detalle_pedidos SET est_pro_ped='PRE' WHERE id_ped_per= $pedido AND id_pro_ped='$producto'");

@@ -132,7 +132,7 @@ class PedidoWidget extends StatelessWidget {
   }
 
   Future<List<Producto>> cargarProductos(int pedidoId) async {
-    final connection = await DatabaseConnection.openConnection();
+    final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute(
         'SELECT p.*, dp.est_pro_ped, dp.id_ped_per, dp.can_pro_ped FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = $pedidoId');
 
@@ -173,7 +173,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
   }
 
   Future<void> cargarPedidos() async {
-    final connection = await DatabaseConnection.openConnection();
+    final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute('SELECT * FROM MAESTRO_PEDIDOS');
 
     final List<Pedido> pedidosList = results.map((row) {
@@ -229,7 +229,7 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
   }
 
   Future<void> cargarProductosPedido() async {
-    final connection = await DatabaseConnection.openConnection();
+    final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute(
         'SELECT p.*, dp.est_pro_ped, dp.id_ped_per, dp.can_pro_ped FROM DETALLE_PEDIDOS dp JOIN PRODUCTOS p ON dp.ID_PRO_PED = p.ID_PRO WHERE dp.ID_PED_PER = ${widget.pedido.id}');
 

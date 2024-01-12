@@ -29,7 +29,7 @@ class _carritoCustom1State extends State<carritoCustom1> {
 
   Future<void> _fetchData() async {
     final globalState = Provider.of<GlobalState>(context, listen: false);
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute(
         "SELECT * from Productos where ID_PRO=\$1",
         parameters: [widget.detallePedido.idProPed]);

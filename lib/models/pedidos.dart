@@ -19,7 +19,7 @@ class Pedido {
   });
 
   void cargarPedido() async{
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute("SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1", parameters: ["1850464338"]);
     List<Pedido> listaPedidos = cargarPedidos(result);
     await conn.close();
@@ -40,7 +40,7 @@ List<Pedido> cargarPedidos(Result result) {
 }
 
 void main() async {
-  final conn = await DatabaseConnection.openConnection();
+  final conn = await DatabaseConnection.instance.openConnection();
   List<ResultRow> Lista =[];
 
   /*final resultPedidos1 = await conn.execute("SELECT * from MAESTRO_PEDIDOS");

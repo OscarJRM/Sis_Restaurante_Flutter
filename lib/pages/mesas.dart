@@ -22,7 +22,7 @@ class _MesasState extends State<Mesas> {
   }
 
   Future<void> _fetchData() async {
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute("SELECT * FROM MESAS where EST_MES=\$1",
         parameters: ["DISPONIBLE"]);
     if (mounted) {

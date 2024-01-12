@@ -29,7 +29,7 @@ class _carritoState extends State<carrito> {
 
   Future<void> _fetchData() async {
     final globalState = Provider.of<GlobalState>(context, listen: false);
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute(
         "SELECT * FROM DETALLE_PEDIDOS where ID_PED_PER =\$1",
         parameters: [globalState.idPed]);

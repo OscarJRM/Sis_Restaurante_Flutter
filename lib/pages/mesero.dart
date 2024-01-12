@@ -173,7 +173,7 @@ class ProductSearch extends SearchDelegate<String> {
 }
 
 Future<List<Plato>> buscarProductos(String query) async {
-  final conn = await DatabaseConnection.openConnection();
+  final conn = await DatabaseConnection.instance.openConnection();
 
   try {
     final result = await conn.execute(

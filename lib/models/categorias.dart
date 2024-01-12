@@ -19,14 +19,14 @@ class Categoria {
         desCat = '';
 
   Future<int> contarCategoria() async {
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute("SELECT COUNT(*) from CATEGORIAS");
     await conn.close();
     return result[0][0] as int;
   }
 
   void cargarCategoria() async {
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute("SELECT * from CATEGORIAS");
     List<Categoria> listaCategorias = cargarCategorias(result);
     await conn.close();
@@ -44,7 +44,7 @@ List<Categoria> cargarCategorias(Result result) {
 }
 
 void main() async {
-  final conn = await DatabaseConnection.openConnection();
+  final conn = await DatabaseConnection.instance.openConnection();
 
   // Utiliza query en lugar de execute para obtener un resultado
   // Utiliza query en lugar de prepare y run para obtener un resultado

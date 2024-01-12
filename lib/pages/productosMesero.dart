@@ -24,7 +24,7 @@ class _ProductosMeseroState extends State<ProductosMesero> {
   }
 
   Future<void> _fetchData() async {
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
     final result = await conn.execute("SELECT * from Productos");
 
     if (mounted) {
