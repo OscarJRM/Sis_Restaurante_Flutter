@@ -59,7 +59,7 @@ class _ProductosMeseroState extends State<ProductosMesero> {
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: 255,
+                mainAxisExtent: 240,
                 crossAxisCount: 2,
                 mainAxisSpacing: 23,
                 crossAxisSpacing: 24,
@@ -73,37 +73,3 @@ class _ProductosMeseroState extends State<ProductosMesero> {
     );
   }
 }
-
-/*
-class productosMesero extends StatelessWidget {
-  const productosMesero({super.key});
-
-  @override
-  Future<Widget> build(BuildContext context) async {
-    final conn = await DatabaseConnection.openConnection();
-
-  // Utiliza query en lugar de execute para obtener un resultado
-  // Utiliza query en lugar de prepare y run para obtener un resultado
-  final result = await conn.execute("SELECT * from Productos");
-
-  // Llena la lista de platos con los resultados obtenidos
-  List<Plato> listaPlatos = Platos(result);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              mainAxisExtent: 200,
-              crossAxisCount: 2,
-              mainAxisSpacing: 23,
-              crossAxisSpacing: 24),
-          itemCount: listaPlatos.length,
-          itemBuilder: (context, index) {
-            return productoCustom(plato: listaPlatos[index]);
-          }),
-    );
-  }
-}
-*/
