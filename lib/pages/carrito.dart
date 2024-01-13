@@ -29,17 +29,23 @@ class _carritoState extends State<carrito> {
 
   Future<void> _fetchData() async {
     final globalState = Provider.of<GlobalState>(context, listen: false);
-    final conn = await DatabaseConnection.openConnection();
-    final result = await conn.execute(
-        "SELECT * FROM DETALLE_PEDIDOS where ID_PED_PER =\$1",
-        parameters: [globalState.idPed]);
-    final result2 = await conn
-        .execute("SELECT * from Productos where ID_PRO=\$1", parameters: [1]);
-    setState(() {
-      listaCarrito = cargarDetallePedidos(result);
-      listaPlatoC = Platos(result2);
-    });
-    await conn.close();
+
+    // Comprueba si el widget está montado antes de llamar a setState
+    if (mounted) {
+      final conn = await DatabaseConnection.instance.openConnection();
+      final result = await conn.execute(
+          "SELECT * FROM DETALLE_PEDIDOS where ID_PED_PER =\$1",
+          parameters: [globalState.idPed]);
+      final result2 = await conn
+          .execute("SELECT * from Productos where ID_PRO=\$1", parameters: [1]);
+      if (mounted) {
+        setState(() {
+          listaCarrito = cargarDetallePedidos(result);
+          listaPlatoC = Platos(result2);
+        });
+      }
+      await conn.close();
+    }
   }
 
   @override

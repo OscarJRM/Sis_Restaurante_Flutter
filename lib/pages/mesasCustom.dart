@@ -5,6 +5,7 @@ import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import '../BaseDatos/conexion.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:intl/intl.dart'; // Necesitas importar esta librería para trabajar con fechas y horas
 
 class mesasCustom extends StatelessWidget {
   final Mesa mesa;
@@ -62,13 +63,21 @@ class mesasCustom extends StatelessWidget {
                                             child: const Text("Cancelar")),
                                         TextButton(
                                             onPressed: () async {
+                                              DateTime currentDateTime =
+                                                  DateTime.now();
+                                              String formattedDateTime =
+                                                  DateFormat(
+                                                          'yyyy-MM-dd HH:mm:ss')
+                                                      .format(currentDateTime);
                                               final conn =
                                                   await DatabaseConnection
+                                                      .instance
                                                       .openConnection();
                                               final result2 =
                                                   await conn.execute(
-                                                r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES (CURRENT_TIMESTAMP, 0.1, $1, $2,$3)',
+                                                r'INSERT INTO MAESTRO_PEDIDOS (FEC_HOR_PED, TOT_PED, CED_EMP_ATI, NUM_MES_PID, ID_EST_PED) VALUES ($1, 0.1, $2, $3, $4)',
                                                 parameters: [
+                                                  formattedDateTime,
                                                   CED_EMP_ATI,
                                                   mesa.numMes,
                                                   "ENV"

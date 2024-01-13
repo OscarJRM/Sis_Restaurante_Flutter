@@ -51,7 +51,7 @@ class _ListaMesasState extends State<ListaMesas> {
   }
 
   Future<void> cargarMesas() async {
-    final connection = await DatabaseConnection.openConnection();
+    final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute('SELECT * FROM MESAS');
 
     final List<Mesa> mesasList = results.map((row) {

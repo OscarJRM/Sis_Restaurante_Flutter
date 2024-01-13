@@ -5,6 +5,7 @@ import 'package:sistema_restaurante/models/platos.dart';
 import "../BaseDatos/conexion.dart";
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:sistema_restaurante/src/conexion.dart';
 
 class productoCustom extends StatefulWidget {
   final Plato plato;
@@ -17,10 +18,12 @@ class productoCustom extends StatefulWidget {
 class _productoCustomState extends State<productoCustom> {
   bool productoAgregado = false;
   Color buttonColor = Color(0xFFE57734);
+  late DatabaseConnection conn;
 
   @override
   void initState() {
     super.initState();
+
 // We can't use async directly in initState, so we use a Future.delayed to schedule the task.
     Future.delayed(Duration.zero, () async {
       // Llamada a la función para verificar el estado del producto
@@ -36,7 +39,7 @@ class _productoCustomState extends State<productoCustom> {
   Future<bool> verificarProductoAgregado() async {
     final globalState =
         Provider.of<GlobalState>(context as BuildContext, listen: false);
-    final conn = await DatabaseConnection.openConnection();
+    final conn = await DatabaseConnection.instance.openConnection();
 
     final result = await conn.execute(
         'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
@@ -125,8 +128,8 @@ class _productoCustomState extends State<productoCustom> {
                             productoAgregado = true;
                           });
                           // Tu lógica para añadir al carrito
-                          final conn =
-                              await DatabaseConnection.openConnection();
+                          final conn = await DatabaseConnection.instance
+                              .openConnection();
                           final result1 = await conn.execute(
                             r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
                             parameters: [
@@ -170,123 +173,82 @@ class _productoCustomState extends State<productoCustom> {
     );
   }
 }
-/*
-class productoCustom extends StatelessWidget {
-  final Plato plato;
-  productoCustom({required this.plato, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final globalState = Provider.of<GlobalState>(context, listen: false);
-    return Container(
-      decoration: const BoxDecoration(
-          boxShadow: [
-            BoxShadow(color: Colors.black, offset: Offset(0, 4), blurRadius: 20)
-          ],
-          color: Color(0xFF212325),
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16), topRight: Radius.circular(16))),
-      child: Column(
-        children: [
-          CachedNetworkImage(
-            imageUrl: plato.urlImg,
-            height: 100,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              height: 100,
-              color: Colors.grey, // Placeholder mientras carga la imagen
-            ),
-            errorWidget: (context, url, error) => Container(
-              height: 100,
-              color: Colors.grey, // Widget de error en caso de problemas
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Column(
-              children: [
-                Text(
-                  plato.nomPro,
-                  style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  plato.idCatPer,
-                  style: GoogleFonts.inter(
-                      color: const Color(0xFF999999), fontSize: 12),
-                ),
-                Text(
-                  "\$ ${plato.preUni}",
-                  style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    final conn = await DatabaseConnection.openConnection();
-                    final result1 = await conn.execute(
-                        r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3)',
-                        parameters: [globalState.idPed, plato.idPro, 1.0]);
-                    const snackBar = SnackBar(
-                        content: Text('Producto añadido al carrito'),
-                        backgroundColor: Color(0xFFE57734));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
-                  child: Container(
-                    height: 30,
-                    width: 100,
-                    decoration: const BoxDecoration(
-                        color: Color(0xFFE57734),
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    child: const Center(
-                      child:
-                          Text("Añadir", style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-*/
 
 // Función para mostrar el AlertDialog y obtener la cantidad
 Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
+  TextEditingController cantidadController = TextEditingController(text: '1');
+
   int? cantidad;
 
   await showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Ingrese la cantidad'),
-        content: TextField(
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            cantidad = int.tryParse(value);
-            if (cantidad != null) {
-              // Validación para asegurarte de que la cantidad sea mayor a 0
-              cantidad = cantidad! > 0 ? cantidad : null;
-            }
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          int current =
+                              int.tryParse(cantidadController.text) ?? 1;
+                          if (current > 1) {
+                            setState(() {
+                              cantidadController.text =
+                                  (current - 1).toString();
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      Container(
+                        width: 50,
+                        child: TextField(
+                          controller: cantidadController,
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          int current =
+                              int.tryParse(cantidadController.text) ?? 1;
+                          setState(() {
+                            cantidadController.text = (current + 1).toString();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
           },
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context)
+                  .pop(); // Cierra el cuadro de diálogo sin realizar ninguna acción adicional
             },
             child: Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
-              if (cantidad != null) {
-                Navigator.of(context).pop(cantidad);
+              int inputCantidad = int.tryParse(cantidadController.text) ?? 0;
+              if (inputCantidad > 0) {
+                cantidad = inputCantidad;
               } else {
                 // Muestra un mensaje de error si la cantidad no es válida
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -296,6 +258,8 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
                   ),
                 );
               }
+              Navigator.of(context)
+                  .pop(); // Cierra el cuadro de diálogo después de realizar la acción
             },
             child: Text('Aceptar'),
           ),
