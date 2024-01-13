@@ -83,6 +83,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           await _mostrarDialogoCantidad(context, cantidad);
 
                       // Verifica si la nueva cantidad es mayor o igual a 1
+
                       if (nuevaCantidad != null && nuevaCantidad >= 1) {
                         // Actualiza la cantidad en la base de datos
                         final conn =
@@ -314,7 +315,8 @@ Future<int?> _mostrarDialogoCantidad(
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(null);
+              nuevaCantidad = cantidadActual; // Usuario canceló
             },
             child: Text('Cancelar'),
           ),

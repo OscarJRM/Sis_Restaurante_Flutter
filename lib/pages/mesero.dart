@@ -292,14 +292,15 @@ Future<bool> verificarProductoAgregado(String idProducto, int idPedido) async {
 
 // Función para mostrar el AlertDialog y obtener la cantidad
 Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
-  int cantidad = 1;
+  int?
+      cantidad; // Usar un nullable int para distinguir si el usuario presionó "Cancelar"
 
   await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
       TextEditingController cantidadController = TextEditingController();
-      cantidadController.text = cantidad.toString();
+      cantidadController.text = '1';
 
       return AlertDialog(
         title: Text('Ingrese la cantidad'),
@@ -328,8 +329,7 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
                       ),
                       SizedBox(width: 20),
                       Container(
-                        width:
-                            50, // Ajusta el ancho del campo de texto según sea necesario
+                        width: 50,
                         child: TextField(
                           controller: cantidadController,
                           keyboardType: TextInputType.number,
@@ -358,7 +358,6 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              cantidad = 0;
             },
             child: Text('Cancelar'),
           ),
@@ -366,7 +365,7 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
             onPressed: () {
               int inputCantidad = int.tryParse(cantidadController.text) ?? 0;
               if (inputCantidad > 0) {
-                Navigator.of(context).pop(inputCantidad);
+                cantidad = inputCantidad;
               } else {
                 // Muestra un mensaje de error si la cantidad no es válida
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -376,6 +375,7 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
                   ),
                 );
               }
+              Navigator.of(context).pop();
             },
             child: Text('Aceptar'),
           ),
