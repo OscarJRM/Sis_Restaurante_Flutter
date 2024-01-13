@@ -8,6 +8,8 @@ class Plato {
   String desPro;
   String urlImg;
   String idCatPer;
+  bool agregadoAlCarrito;
+
 
   Plato({
     required this.idPro,
@@ -16,6 +18,7 @@ class Plato {
     required this.desPro,
     required this.urlImg,
     required this.idCatPer,
+    required this.agregadoAlCarrito,
   });
 }
 
@@ -28,6 +31,8 @@ List<Plato> Platos(Result result) {
       desPro: row[3] as String,
       urlImg: row[4] as String,
       idCatPer: row[5] as String,
+      agregadoAlCarrito: false, // Inicializar como false por defecto
+
     );
   }).toList();
 }

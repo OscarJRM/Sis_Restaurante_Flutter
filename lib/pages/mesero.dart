@@ -114,7 +114,6 @@ class Mesero extends StatelessWidget {
 
 // Nuevo widget para manejar la búsqueda de productos
 class ProductSearch extends SearchDelegate<String> {
-  
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -140,7 +139,7 @@ class ProductSearch extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder<List<Plato>>(
-      future: buscarProductos(query),
+      future: buscarProductos(context, query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -156,13 +155,16 @@ class ProductSearch extends SearchDelegate<String> {
                     style: TextStyle(color: Colors.white)),
                 subtitle: Text('Precio: ${productos[index].preUni}',
                     style: TextStyle(color: Colors.white)),
-                // Añadir un botón para agregar al carrito
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    _agregarAlCarrito(context, productos[index]);
-                  },
-                  child: Text('Añadir'),
-                ),
+                // Añadir un botón para agregar al carrito solo si no está agregado
+                trailing: productos[index].agregadoAlCarrito
+                    ? ElevatedButton(
+                        onPressed: () {}, child: Text('Agregado al carrito'))
+                    : ElevatedButton(
+                        onPressed: () {
+                          _agregarAlCarrito(context, productos[index]);
+                        },
+                        child: Text('Añadir'),
+                      ),
               );
             },
           );
@@ -198,6 +200,7 @@ class ProductSearch extends SearchDelegate<String> {
         ],
       );
 
+
       // Mostrar notificación en el SnackBar
       final snackBar = SnackBar(
         content: Text('Producto añadido al carrito'),
@@ -208,22 +211,51 @@ class ProductSearch extends SearchDelegate<String> {
   }
 }
 
-Future<List<Plato>> buscarProductos(String query) async {
+Future<List<Plato>> buscarProductos(BuildContext context, String query) async {
   final conn = await DatabaseConnection.instance.openConnection();
 
   try {
     final result = await conn.execute(
         Sql.named("SELECT * FROM Productos WHERE lower(Nom_pro) LIKE @query"),
         parameters: {'query': '%${query.toLowerCase()}%'});
-    print('Resultados: $result');
 
     // Llena la lista de platos con los resultados obtenidos
     List<Plato> listaPlatos = Platos(result);
+
+    // Verifica si cada producto está en el carrito
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    for (var producto in listaPlatos) {
+      final agregado =
+          await verificarProductoAgregado(producto.idPro, globalState.idPed);
+      producto.agregadoAlCarrito = agregado;
+    }
 
     return listaPlatos;
   } catch (e) {
     print('Error en la búsqueda de productos: $e');
     return []; // Devuelve una lista vacía en caso de error
+  } finally {
+    // Cierra la conexión cuando hayas terminado de usarla
+    await conn.close();
+  }
+}
+
+// Función para verificar si un producto está en el carrito
+Future<bool> verificarProductoAgregado(String idProducto, int idPedido) async {
+  final conn = await DatabaseConnection.instance.openConnection();
+
+  try {
+    final result = await conn.execute(
+      'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
+      parameters: [idPedido, idProducto],
+    );
+    debugPrint(result.toString());
+    return result.isNotEmpty &&
+        result[0][0] != null &&
+        (result[0][0]! as int) > 0;
+  } catch (e) {
+    print('Error al verificar producto en el carrito: $e');
+    return false;
   } finally {
     // Cierra la conexión cuando hayas terminado de usarla
     await conn.close();
@@ -279,4 +311,3 @@ Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
 
   return cantidad;
 }
-
