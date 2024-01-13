@@ -8,9 +8,14 @@ import '../models/platos.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:sistema_restaurante/models/vGlobal.dart';
 
-class Mesero extends StatelessWidget {
+class Mesero extends StatefulWidget {
   const Mesero({super.key});
 
+  @override
+  State<Mesero> createState() => _MeseroState();
+}
+
+class _MeseroState extends State<Mesero> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -158,13 +163,32 @@ class ProductSearch extends SearchDelegate<String> {
                 // Añadir un botón para agregar al carrito solo si no está agregado
                 trailing: productos[index].agregadoAlCarrito
                     ? ElevatedButton(
-                        onPressed: () {}, child: Text('Agregado al carrito'))
+                        onPressed: () {},
+                        child: Text('Agregado al carrito',
+                            style: TextStyle(color: Colors.black)),
+                        style: ButtonStyle(
+                            mouseCursor: MaterialStateProperty.all(
+                                SystemMouseCursors.click),
+                            minimumSize:
+                                MaterialStateProperty.all(Size(100, 40)),
+                            backgroundColor:
+                                MaterialStatePropertyAll(Color(0xFFE57734))))
                     : ElevatedButton(
                         onPressed: () {
                           _agregarAlCarrito(context, productos[index]);
                         },
-                        child: Text('Añadir'),
-                      ),
+                        child: Text('Añadir',
+                            style: TextStyle(color: Colors.black)),
+                        style: ButtonStyle(
+                            mouseCursor: MaterialStateProperty.all(
+                                SystemMouseCursors.click),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5))),
+                            minimumSize:
+                                MaterialStateProperty.all(Size(100, 40)),
+                            backgroundColor:
+                                MaterialStatePropertyAll(Color(0xFFE57734)))),
               );
             },
           );
@@ -200,6 +224,8 @@ class ProductSearch extends SearchDelegate<String> {
         ],
       );
 
+      // Actualiza la propiedad agregadoAlCarrito del producto
+      producto.agregadoAlCarrito = true;
 
       // Mostrar notificación en el SnackBar
       final snackBar = SnackBar(

@@ -8,17 +8,14 @@ import 'package:sistema_restaurante/models/vGlobal.dart';
 class Pedidos extends StatefulWidget {
   const Pedidos({Key? key}) : super(key: key);
 
-
   @override
   State<Pedidos> createState() => _PedidosState();
-
-  
 }
 
 class _PedidosState extends State<Pedidos> {
   late List<Pedido> listaPedidos = [];
   late bool isFetchingData = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -77,8 +74,21 @@ class _PedidosState extends State<Pedidos> {
                       return pedidoCustom(pedido: listaPedidos[index]);
                     },
                   )
-                : const Center(
-                    child: CircularProgressIndicator(),
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "No hay pedidos disponibles.",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          "Agregue una mesa para realizar un pedido.",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
       ),
     );
