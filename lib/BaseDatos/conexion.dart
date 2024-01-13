@@ -16,12 +16,3 @@ class DatabaseConnection {
     return conn;
   }
 }
-
-void main() async {
-  final conn = await DatabaseConnection.openConnection();
-
-  // Utiliza query en lugar de execute para obtener un resultado
-  // Utiliza query en lugar de prepare y run para obtener un resultado
-
-  await conn.close();
-}

@@ -47,10 +47,14 @@ class _LoginState extends State<Login> {
         });
         if (result[0][5] == "COCINA") {
           // ignore: use_build_context_synchronously
+          await dataBase.close();
+          print('Se cerró la conexión');
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Vista()));
           return true;
         } else if (result[0][5] == "MESERO") {
+          await dataBase.close();
+          print('Se cerró la conexión');
           // ignore: use_build_context_synchronously
           Navigator.push(
             context,
@@ -68,7 +72,6 @@ class _LoginState extends State<Login> {
           print('el empleado no existe');
         }
       }
-      await dataBase.close();
     } catch (e) {
       if (kDebugMode) {
         print('Error: $e');
