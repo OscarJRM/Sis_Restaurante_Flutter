@@ -174,17 +174,19 @@ class ProductSearch extends SearchDelegate<String> {
                             backgroundColor:
                                 MaterialStatePropertyAll(Color(0xFFE57734))))
                     : ElevatedButton(
-                        onPressed: () {
-                          _agregarAlCarrito(context, productos[index]);
+                        onPressed: () async {
+                          final cantidad =
+                              await _mostrarDialogoCantidad(context);
+                          if (cantidad != null && cantidad > 0) {
+                            _agregarAlCarrito(
+                                context, productos[index], cantidad);
+                          }
                         },
                         child: Text('Añadir',
                             style: TextStyle(color: Colors.black)),
                         style: ButtonStyle(
                             mouseCursor: MaterialStateProperty.all(
                                 SystemMouseCursors.click),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5))),
                             minimumSize:
                                 MaterialStateProperty.all(Size(100, 40)),
                             backgroundColor:
@@ -206,34 +208,34 @@ class ProductSearch extends SearchDelegate<String> {
   }
 
   // Función para agregar el producto al carrito
-  Future<void> _agregarAlCarrito(BuildContext context, Plato producto) async {
-    final cantidad = await _mostrarDialogoCantidad(context);
+  Future<void> _agregarAlCarrito(
+    BuildContext context,
+    Plato producto,
+    int cantidad,
+  ) async {
+    // Lógica para agregar al carrito
+    final conn = await DatabaseConnection.instance.openConnection();
+    final globalState = Provider.of<GlobalState>(context, listen: false);
 
-    if (cantidad != null && cantidad > 0) {
-      // Lógica para agregar al carrito
-      final conn = await DatabaseConnection.instance.openConnection();
-      final globalState = Provider.of<GlobalState>(context, listen: false);
+    final result = await conn.execute(
+      r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
+      parameters: [
+        globalState.idPed,
+        producto.idPro,
+        "PEN",
+        cantidad,
+      ],
+    );
 
-      final result = await conn.execute(
-        r'INSERT INTO DETALLE_PEDIDOs VALUES ($1,$2,$3,$4)',
-        parameters: [
-          globalState.idPed,
-          producto.idPro,
-          "PEN",
-          cantidad,
-        ],
-      );
+    // Actualiza la propiedad agregadoAlCarrito del producto
+    producto.agregadoAlCarrito = true;
 
-      // Actualiza la propiedad agregadoAlCarrito del producto
-      producto.agregadoAlCarrito = true;
-
-      // Mostrar notificación en el SnackBar
-      final snackBar = SnackBar(
-        content: Text('Producto añadido al carrito'),
-        backgroundColor: Color(0xFFE57734),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
+    // Mostrar notificación en el SnackBar
+    final snackBar = SnackBar(
+      content: Text('Producto añadido al carrito'),
+      backgroundColor: Color(0xFFE57734),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
 
@@ -290,34 +292,81 @@ Future<bool> verificarProductoAgregado(String idProducto, int idPedido) async {
 
 // Función para mostrar el AlertDialog y obtener la cantidad
 Future<int?> _mostrarDialogoCantidad(BuildContext context) async {
-  int? cantidad;
+  int cantidad = 1;
 
   await showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (BuildContext context) {
+      TextEditingController cantidadController = TextEditingController();
+      cantidadController.text = cantidad.toString();
+
       return AlertDialog(
         title: Text('Ingrese la cantidad'),
-        content: TextField(
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            cantidad = int.tryParse(value);
-            if (cantidad != null) {
-              // Validación para asegurarte de que la cantidad sea mayor a 0
-              cantidad = cantidad! > 0 ? cantidad : null;
-            }
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          int current =
+                              int.tryParse(cantidadController.text) ?? 1;
+                          if (current > 1) {
+                            setState(() {
+                              cantidadController.text =
+                                  (current - 1).toString();
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      Container(
+                        width:
+                            50, // Ajusta el ancho del campo de texto según sea necesario
+                        child: TextField(
+                          controller: cantidadController,
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          int current =
+                              int.tryParse(cantidadController.text) ?? 1;
+                          setState(() {
+                            cantidadController.text = (current + 1).toString();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
           },
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
+              cantidad = 0;
             },
             child: Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
-              if (cantidad != null) {
-                Navigator.of(context).pop(cantidad);
+              int inputCantidad = int.tryParse(cantidadController.text) ?? 0;
+              if (inputCantidad > 0) {
+                Navigator.of(context).pop(inputCantidad);
               } else {
                 // Muestra un mensaje de error si la cantidad no es válida
                 ScaffoldMessenger.of(context).showSnackBar(

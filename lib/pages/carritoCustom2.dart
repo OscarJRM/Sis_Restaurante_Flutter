@@ -85,7 +85,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
                       // Verifica si la nueva cantidad es mayor o igual a 1
                       if (nuevaCantidad != null && nuevaCantidad >= 1) {
                         // Actualiza la cantidad en la base de datos
-                        final conn = await DatabaseConnection.instance.openConnection();
+                        final conn =
+                            await DatabaseConnection.instance.openConnection();
                         await conn.execute(
                           'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1 WHERE ID_PED_PER = \$2 AND ID_PRO_PED = \$3',
                           parameters: [
@@ -97,7 +98,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         await conn.close();
 
                         // Recarga la lista de detalles del pedido
-                        final conn2 = await DatabaseConnection.instance.openConnection();
+                        final conn2 =
+                            await DatabaseConnection.instance.openConnection();
                         final result = await conn2.execute(
                           "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
                           parameters: [globalState.idPed],
@@ -126,7 +128,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
 
                       if (nuevaCantidad != null && nuevaCantidad >= cantidad) {
                         // Actualiza la cantidad en la base de datos
-                        final conn = await DatabaseConnection.instance.openConnection();
+                        final conn =
+                            await DatabaseConnection.instance.openConnection();
                         await conn.execute(
                           'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1 WHERE ID_PED_PER = \$2 AND ID_PRO_PED = \$3',
                           parameters: [
@@ -138,7 +141,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         await conn.close();
 
                         // Recarga la lista de detalles del pedido
-                        final conn2 = await DatabaseConnection.instance.openConnection();
+                        final conn2 =
+                            await DatabaseConnection.instance.openConnection();
                         final result = await conn2.execute(
                           "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
                           parameters: [globalState.idPed],
@@ -211,7 +215,8 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         );
                       } else {
                         // Realiza la eliminación del producto de DETALLE_PEDIDOS
-                        final conn = await DatabaseConnection.instance.openConnection();
+                        final conn =
+                            await DatabaseConnection.instance.openConnection();
                         final result = await conn.execute(
                           'DELETE FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
                           parameters: [globalState.idPed, widget.plato.idPro],
@@ -246,22 +251,64 @@ class _carritoCustom2State extends State<carritoCustom2> {
 // Función para mostrar el AlertDialog y obtener la cantidad
 Future<int?> _mostrarDialogoCantidad(
     BuildContext context, int cantidadActual) async {
-  int? nuevaCantidad;
+  int? nuevaCantidad = cantidadActual;
 
   await showDialog(
     context: context,
     builder: (BuildContext context) {
+      TextEditingController cantidadController =
+          TextEditingController(text: cantidadActual.toString());
+
       return AlertDialog(
         title: Text('Editar Cantidad'),
-        content: TextField(
-          keyboardType: TextInputType.numberWithOptions(decimal: false),
-          controller: TextEditingController(text: cantidadActual.toString()),
-          onChanged: (value) {
-            nuevaCantidad = int.tryParse(value);
-            if (nuevaCantidad != null) {
-              // Validación para asegurar que la cantidad sea positiva
-              nuevaCantidad = nuevaCantidad! > 0 ? nuevaCantidad : null;
-            }
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            nuevaCantidad = (nuevaCantidad ?? 1) - 1;
+                            cantidadController.text = nuevaCantidad.toString();
+                          });
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      Container(
+                        width: 50,
+                        child: TextField(
+                          controller: cantidadController,
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          onChanged: (value) {
+                            setState(() {
+                              nuevaCantidad = int.tryParse(value) ?? 1;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            nuevaCantidad = (nuevaCantidad ?? 1) + 1;
+                            cantidadController.text = nuevaCantidad.toString();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
           },
         ),
         actions: <Widget>[
@@ -273,7 +320,7 @@ Future<int?> _mostrarDialogoCantidad(
           ),
           TextButton(
             onPressed: () {
-              if (nuevaCantidad != null) {
+              if (nuevaCantidad != null && nuevaCantidad! > 0) {
                 Navigator.of(context).pop(nuevaCantidad);
               } else {
                 // Muestra un mensaje de error si la cantidad no es válida
