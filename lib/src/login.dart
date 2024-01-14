@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:postgres/postgres.dart';
+import 'package:sistema_restaurante/Admin/VistaAdmin.dart';
 import 'package:sistema_restaurante/VistaCocina/Vista.dart';
 import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import 'package:sistema_restaurante/src/conexion.dart';
@@ -49,6 +50,7 @@ class _LoginState extends State<Login> {
           // ignore: use_build_context_synchronously
           await dataBase.close();
           print('Se cerró la conexión');
+          // ignore: use_build_context_synchronously
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Vista()));
           return true;
@@ -61,6 +63,17 @@ class _LoginState extends State<Login> {
             MaterialPageRoute(
                 builder: (context) => menuPedidos1(result[0][0] as String,
                     result[0][1] as String, result[0][2] as String)),
+          );
+          return true;
+        } else if (result[0][5] == "GERENTE") {
+          await dataBase.close();
+          print('Se cerró la conexión');
+          // ignore: use_build_context_synchronously
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    vistaAdmin(result[0][1] as String, result[0][2] as String)),
           );
           return true;
         }

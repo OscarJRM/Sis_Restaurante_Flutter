@@ -1,72 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:sistema_restaurante/Admin/ContentNavigator.dart';
+import 'package:sistema_restaurante/Admin/reportes.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:sistema_restaurante/src/login.dart';
 
-void main() {
-  runApp(MyApp());
+//Paquete: flutter pub add fl_chart
+
+// ignore: camel_case_types
+class vistaAdmin extends StatefulWidget {
+  final String _name;
+  final String _apellido;
+  const vistaAdmin(this._name, this._apellido, {super.key});
+  @override
+  State<vistaAdmin> createState() => _menuAdmin();
 }
 
-class MyApp extends StatelessWidget {
+// ignore: camel_case_types
+class _menuAdmin extends State<vistaAdmin> {
+  late ContentNavigator contentNavigator;
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Responsive Flutter App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
+  void initState() {
+    super.initState();
+    contentNavigator = ContentNavigator();
   }
-}
 
-class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.updateNom(widget._name);
+    globalState.updateApe(widget._apellido);
+
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Responsive App'),
+            title: const Text(
+              "Bienvenido a Gerencia",
+              style: TextStyle(color: Colors.white),
+            ),
+            centerTitle: true,
+            backgroundColor: const Color.fromARGB(255, 26, 27, 29),
+            iconTheme: const IconThemeData(color: Colors.white),
           ),
           drawer: sizingInformation.deviceScreenType == DeviceScreenType.desktop
-              ? null // No mostrar el menú lateral en pantallas de escritorio
-              : Drawer(
+              ? Drawer(
+                  backgroundColor: const Color.fromARGB(255, 26, 27, 29),
                   child: ListView(
                     padding: EdgeInsets.zero,
                     children: [
                       DrawerHeader(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.blue,
                         ),
-                        child: Text(
-                          'Menú',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const CircleAvatar(
+                                radius:
+                                    40, // Ajusta el tamaño del círculo según tus preferencias
+                                backgroundImage: AssetImage(
+                                    'images/icono-del-administrador-de-administración-equipos-personas-274290093.webp')),
+                            const SizedBox(
+                                height:
+                                    10), // Espacio entre la imagen y el texto
+                            Text(
+                              "Usuario: ${widget._name} ${widget._apellido}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       ListTile(
-                        title: Text('Ventas Realizadas'),
+                        title: const Text('Registro de Ventas'),
+                        textColor: Colors.white,
                         onTap: () {
-                          Navigator.pop(context);
+                          contentNavigator.navigateTo('/registro_ventas');
                           // Lógica para manejar la selección de la opción 1
                         },
                       ),
                       ListTile(
-                        title: Text('Productos '),
+                        title: const Text('Reportes'),
+                        textColor: Colors.white,
                         onTap: () {
-                          Navigator.pop(context);
+                          contentNavigator.navigateTo('/reportes');
+                          // Lógica para manejar la selección de la opción 2
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Cerrar Sesión'),
+                        textColor: Colors.white,
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Login()));
                           // Lógica para manejar la selección de la opción 2
                         },
                       ),
                     ],
                   ),
-                ),
-          body: Center(
-            child: Text(
-              'Contenido principal',
-              style: TextStyle(fontSize: 24),
-            ),
+                )
+              : null,
+          body: Navigator(
+            key: contentNavigator.navigatorKey,
+            onGenerateRoute: (settings) {
+              Widget page;
+              switch (settings.name) {
+                case '/registro_ventas':
+                  page = ReportesScreen();
+                  break;
+                case '/reportes':
+                  page = ReportesScreen();
+                  break;
+                default:
+                  page =
+                      const SizedBox(); // Puedes cambiar esto a una pantalla por defecto
+              }
+              return MaterialPageRoute(builder: (context) => page);
+            },
           ),
         );
       },

@@ -42,7 +42,7 @@ class MainApp extends StatelessWidget {
         '/': (context) => const Login(),
         '/mesas': (context) => const menuMesas(),
         '/menu': (context) => const Mesero(),
-        '/carrito': (context) =>  menuCarrito(),
+        '/carrito': (context) => menuCarrito(),
         '/Vista': (context) => Vista(),
       },
     );
