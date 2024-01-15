@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import '../BaseDatos/conexion.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 
 class PagoEfectivoView extends StatefulWidget {
   @override
@@ -19,6 +21,8 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
   bool clienteExistente = false;
 
   // Datos para la factura
+
+ 
   double montoTotal = 10.0;
   String fechaEmision = DateTime.now().toLocal().toString();
 
@@ -204,11 +208,14 @@ showDialog(
 
 Future<void> facturarCliente() async {
   final connection = await DatabaseConnection.instance.openConnection();
+  final globalState = Provider.of<GlobalState>(context, listen: false);
 
   await connection.execute(
     "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision) VALUES "
-"('${cedulaController.text}', 1, $montoTotal, '${DateTime.now().toLocal()}')",
+"('${cedulaController.text}', 1, $globalState.Total, '${DateTime.now().toLocal()}')",
   );
+
+//idPed
 
   await connection.close();
 
