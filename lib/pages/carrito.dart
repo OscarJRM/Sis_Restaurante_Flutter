@@ -57,7 +57,7 @@ class _carritoState extends State<carrito> {
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: 330,
+                mainAxisExtent: 260,
                 crossAxisCount: 2,
                 mainAxisSpacing: 23,
                 crossAxisSpacing: 24,

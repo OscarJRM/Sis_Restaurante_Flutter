@@ -47,8 +47,8 @@ class _PedidosState extends State<Pedidos> {
       final globalState = Provider.of<GlobalState>(context, listen: false);
       final conn = await DatabaseConnection.instance.openConnection();
       final result = await conn.execute(
-        'SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1',
-        parameters: [globalState.cedEmpAti],
+        'SELECT * from MAESTRO_PEDIDOS where CED_EMP_ATI=\$1 AND ID_EST_PED<>\$2 order by id_ped ASC',
+        parameters: [globalState.cedEmpAti, 'DES'],
       );
       setState(() {
         listaPedidos = cargarPedidos(result);

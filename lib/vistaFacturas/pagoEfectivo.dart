@@ -3,6 +3,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:sistema_restaurante/pages/menuPedidos.dart';
 import '../BaseDatos/conexion.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
@@ -13,6 +14,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class PagoEfectivoView extends StatefulWidget {
   @override
@@ -228,26 +230,28 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     final connection = await DatabaseConnection.instance.openConnection();
     final globalState = Provider.of<GlobalState>(context, listen: false);
 
-      await connection.execute(
-    "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
-  );
-
-  // Obtener el número de mesa del pedido
-  final resultsMesa = await connection.execute(
-    "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
-  );
-
-  if (resultsMesa.isNotEmpty) {
-    final numMesa = resultsMesa.first[0];
-
     await connection.execute(
-      "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
+      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
     );
-  }
+
+    // Obtener el número de mesa del pedido
+    final resultsMesa = await connection.execute(
+      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
+    );
+
+    if (resultsMesa.isNotEmpty) {
+      final numMesa = resultsMesa.first[0];
+
+      await connection.execute(
+        "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
+      );
+    }
 
     final results = await connection.execute(
       "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
     );
+    _sendMessage(globalState.cedEmpAti, "Terminado", globalState.idPed,
+        globalState.socket);
 
     if (results.isNotEmpty) {
       final clienteInfo = results.first;
@@ -370,4 +374,9 @@ void main() {
   runApp(MaterialApp(
     home: PagoEfectivoView(),
   ));
+}
+
+_sendMessage(String cedula, String pedido, int idPed, IO.Socket? _socket) {
+  _socket
+      ?.emit("message", {'message': pedido, 'sender': cedula, 'idPed': idPed});
 }

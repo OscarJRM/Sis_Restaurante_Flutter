@@ -16,6 +16,7 @@ class GlobalState extends ChangeNotifier {
   double Total = 0.00;
   IO.Socket? socket = null;
   String json = '';
+  int mesa = 0;
 
   void updateCedEmpAti(String newCedEmpAti) {
     cedEmpAti = newCedEmpAti;
@@ -46,10 +47,15 @@ class GlobalState extends ChangeNotifier {
     json = newjson;
     notifyListeners();
   }
+
   void _connectSocket() {
     socket?.onConnect((data) => print('Connected'));
     socket?.onConnectError((data) => print('Error $data'));
     socket?.onDisconnect((data) => print('Disconnected'));
+  }
+
+  void updateMesa(int newmesa) {
+    mesa = newmesa;
 
   }
 

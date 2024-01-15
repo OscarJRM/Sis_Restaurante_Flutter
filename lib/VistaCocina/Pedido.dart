@@ -82,6 +82,9 @@ class _PedidoWidgetState extends State<PedidoWidget> {
       ),
       child: InkWell(
         onTap: () {
+          final globalState = Provider.of<GlobalState>(context, listen: false);
+          globalState.updateMesa(widget.pedido.numeroMesa);
+          globalState.updateCedEmpAti(widget.pedido.cedulaEmpleado);
           _mostrarProductos(context, widget.pedido.id);
         },
         child: Container(
@@ -147,9 +150,8 @@ class _PedidoWidgetState extends State<PedidoWidget> {
       _productosController
           .add(productos); // Agrega los nuevos productos al stream
       if (mounted) {
-        setState(() {
-          print("Recibido mensaje, recargando productos");
-        });
+        setState(() {});
+        print("carga");
       }
     });
 
@@ -234,14 +236,24 @@ class _ListaPedidosState extends State<ListaPedidos> {
     _socket.onConnect((data) => print('Connected+'));
     _socket.onConnectError((data) => print('Error $data'));
     _socket.onDisconnect((data) => print('Disconnected'));
-
+    int i = 0;
     _socket.on("message", (data) {
       print(data);
+      int idePed = data['idPed'];
       if (mounted) {
         setState(() {
           cargarPedidos();
           print("carga");
-          _mostrarSnackbar(context, "listo");
+          String pedido = data['message'];
+          String? nombre = data['nombre'];
+          if (nombre == null) {
+            if (pedido == "Enviado") {
+              _mostrarSnackbar(context, "Pedido #$idePed entrante!");
+            } else if (pedido == "Terminado") {
+              _mostrarSnackbar(context, "Pedido #$idePed Despachado!");
+            }
+          }
+
           //_sound();
         });
       }
@@ -267,7 +279,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
   Future<void> cargarPedidos() async {
     print("Cargando pedidos");
     final connection = await DatabaseConnection.instance.openConnection();
-    final results = await connection.execute('SELECT * FROM MAESTRO_PEDIDOS');
+    final results = await connection.execute(
+        "SELECT * FROM MAESTRO_PEDIDOS WHERE id_est_ped != 'DES' order by id_ped ASC");
 
     final List<Pedido> pedidosList = results.map((row) {
       return Pedido(
@@ -384,6 +397,7 @@ _mostrarSnackbar(BuildContext context, String mensaje) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(mensaje),
+      backgroundColor: Colors.green,
     ),
   );
 }
