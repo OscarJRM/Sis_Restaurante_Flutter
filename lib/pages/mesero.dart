@@ -56,17 +56,6 @@ class _MeseroState extends State<Mesero> {
           ),
           centerTitle: true,
           actions: [
-            badges.Badge(
-              badgeContent: Text(
-                '',
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              child: Icon(Icons.shopping_bag, color: Colors.white),
-              badgeStyle: badges.BadgeStyle(
-                badgeColor: Color(0xFFE57734),
-              ),
-            ),
             SizedBox(width: 20.0),
             IconButton(
               icon: Icon(Icons.search, color: Colors.white),

@@ -249,7 +249,6 @@ class _carritoCustom2State extends State<carritoCustom2> {
   }
 }
 
-// Función para mostrar el AlertDialog y obtener la cantidad
 Future<int?> _mostrarDialogoCantidad(
     BuildContext context, int cantidadActual) async {
   int? nuevaCantidad = cantidadActual;
@@ -276,7 +275,10 @@ Future<int?> _mostrarDialogoCantidad(
                         icon: Icon(Icons.remove),
                         onPressed: () {
                           setState(() {
-                            nuevaCantidad = (nuevaCantidad ?? 1) - 1;
+                            // Evita que la cantidad sea menor a 1
+                            nuevaCantidad = (nuevaCantidad ?? 1) > 1
+                                ? (nuevaCantidad ?? 1) - 1
+                                : 1;
                             cantidadController.text = nuevaCantidad.toString();
                           });
                         },

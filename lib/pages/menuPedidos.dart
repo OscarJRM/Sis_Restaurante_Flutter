@@ -5,6 +5,7 @@ import "package:sistema_restaurante/pages/wArgumentos.dart";
 import 'Pedidos.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class menuPedidos1 extends StatefulWidget {
   final String _cedula;
@@ -17,6 +18,31 @@ class menuPedidos1 extends StatefulWidget {
 }
 
 class _menuPedidos1State extends State<menuPedidos1> {
+  late IO.Socket _socket;
+
+  _sendMessage(String pedido) {
+    _socket.emit('message', {'message': pedido, 'sender': widget._name});
+  }
+
+  _connectSocket() {
+    _socket.onConnect((data) => print('Connected'));
+    _socket.onConnectError((data) => print('Error $data'));
+    _socket.onDisconnect((data) => print('Disconnected'));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _socket = IO.io(
+        'https://sistemarestaurante.webpubsub.azure.com',
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .setPath("/clients/socketio/hubs/Centro")
+            .setQuery({'username': widget._cedula})
+            .build());
+    _connectSocket();
+  }
+
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
@@ -50,7 +76,14 @@ class _menuPedidos1State extends State<menuPedidos1> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        actions: [SizedBox(width: 20.0)],
+        actions: [
+          SizedBox(width: 20.0),
+          IconButton(
+              onPressed: () {
+                _sendMessage("1");
+              },
+              icon: Icon(Icons.notification_add))
+        ],
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
