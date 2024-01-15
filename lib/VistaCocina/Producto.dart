@@ -152,7 +152,6 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                     _sendMessage(
                         globalState.cedEmpAti, estado, globalState.socket);
 
-                    // Aquí puedes almacenar el estado en una variable si es necesario
                     print('Estado actual del producto: $estado');
                   });
                 },
