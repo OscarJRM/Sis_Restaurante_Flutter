@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -30,11 +32,16 @@ class Pedido {
   });
 }
 
-class PedidoWidget extends StatelessWidget {
+class PedidoWidget extends StatefulWidget {
   final Pedido pedido;
 
   const PedidoWidget({Key? key, required this.pedido}) : super(key: key);
 
+  @override
+  State<PedidoWidget> createState() => _PedidoWidgetState();
+}
+
+class _PedidoWidgetState extends State<PedidoWidget> {
   String _estadoPedido(String estado) {
     if (estado == 'PEN' || estado == 'ENV') {
       return 'Pendiente';
@@ -51,6 +58,20 @@ class PedidoWidget extends StatelessWidget {
     return formattedDateTime;
   }
 
+  _connectSocket() {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+
+    globalState.socket?.onConnect((data) => print('Connected+'));
+    globalState.socket?.onConnectError((data) => print('Error $data'));
+    globalState.socket?.onDisconnect((data) => print('Disconnected'));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _connectSocket();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -61,7 +82,7 @@ class PedidoWidget extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          _mostrarProductos(context, pedido.id);
+          _mostrarProductos(context, widget.pedido.id);
         },
         child: Container(
           width: 150,
@@ -75,7 +96,7 @@ class PedidoWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Pedido #${pedido.id}',
+                  'Pedido #${widget.pedido.id}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -84,7 +105,7 @@ class PedidoWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Fecha y Hora: ${_fechaHoraPedido(pedido.fechaHora)}',
+                  'Fecha y Hora: ${_fechaHoraPedido(widget.pedido.fechaHora)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 /*Text(
@@ -92,15 +113,15 @@ class PedidoWidget extends StatelessWidget {
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),*/
                 Text(
-                  'C.I. Mesero: ${pedido.cedulaEmpleado}',
+                  'C.I. Mesero: ${widget.pedido.cedulaEmpleado}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  'Número de Mesa: ${pedido.numeroMesa}',
+                  'Número de Mesa: ${widget.pedido.numeroMesa}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  'Estado: ${_estadoPedido(pedido.idEstadoPedido)}',
+                  'Estado: ${_estadoPedido(widget.pedido.idEstadoPedido)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
@@ -112,7 +133,26 @@ class PedidoWidget extends StatelessWidget {
   }
 
   Future<void> _mostrarProductos(BuildContext context, int pedidoId) async {
-    final List<Producto> productos = await cargarProductos(pedidoId);
+    _connectSocket();
+    final _productosController = StreamController<List<Producto>>();
+
+    List<Producto> productos = await cargarProductos(pedidoId);
+    _productosController.add(productos);
+
+    // Escuchar el evento "message" en el contexto actual
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.socket?.on("message", (data) async {
+      _mostrarSnackbar(context, "Recibido mensaje");
+      print(data);
+      productos = await cargarProductos(pedidoId);
+      _productosController
+          .add(productos); // Agrega los nuevos productos al stream
+      if (mounted) {
+        setState(() {
+          print("Recibido mensaje, recargando productos");
+        });
+      }
+    });
 
     await showDialog(
       context: context,
@@ -121,7 +161,16 @@ class PedidoWidget extends StatelessWidget {
           title: Text('Productos del Pedido #$pedidoId'),
           content: SizedBox(
             width: double.maxFinite,
-            child: ListaProductos(productos: productos),
+            child: StreamBuilder<List<Producto>>(
+              stream: _productosController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListaProductos(productos: snapshot.data!);
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
           ),
           actions: [
             ElevatedButton(
@@ -134,6 +183,12 @@ class PedidoWidget extends StatelessWidget {
         );
       },
     );
+    @override
+    void dispose() {
+      _productosController
+          .close(); // Asegúrate de cerrar el controlador al finalizar
+      super.dispose();
+    }
   }
 
   Future<List<Producto>> cargarProductos(int pedidoId) async {
@@ -260,10 +315,29 @@ class ListaProductosPedido extends StatefulWidget {
 
 class _ListaProductosPedidoState extends State<ListaProductosPedido> {
   List<Producto> productos = [];
+  _connectSocket() {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    print("2");
+    globalState.socket?.onConnect((data) => print('Connected+'));
+    globalState.socket?.onConnectError((data) => print('Error $data'));
+    globalState.socket?.onDisconnect((data) => print('Disconnected'));
+
+    globalState.socket?.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          print("carga pedidos");
+          cargarProductosPedido();
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _connectSocket();
+    print("1");
     cargarProductosPedido();
   }
 
@@ -285,6 +359,7 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
     }).toList();
 
     setState(() {
+      print("Si");
       productos = productosList;
     });
 
