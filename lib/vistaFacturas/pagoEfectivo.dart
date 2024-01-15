@@ -22,7 +22,6 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
 
   // Datos para la factura
 
- 
   double montoTotal = 10.0;
   String fechaEmision = DateTime.now().toLocal().toString();
 
@@ -78,77 +77,82 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     await connection.close();
   }
 
-void _mostrarInfoCliente() async {
-  final connection = await DatabaseConnection.instance.openConnection();
+  void _mostrarInfoCliente() async {
+    final connection = await DatabaseConnection.instance.openConnection();
 
-  final results = await connection.execute(
-    "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
-  );
-
-  await connection.close();
-
-  if (results.isNotEmpty) {
-    final clienteInfo = results.first;
-
-final columnNames = ['Cedula', 'Nombre', 'Apellido', 'Direccion', 'Telefono', 'Correo'];
-
-showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return AlertDialog(
-      title: const Text('Información del Cliente'),
-      content: Column(
-        children: [
-          ...clienteInfo.asMap().entries.map(
-            (entry) => ListTile(
-              title: Text('${columnNames[entry.key]}: ${entry.value}'),
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cerrar'),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            await facturarCliente();
-
-            Navigator.of(context).pop();
-          },
-          child: const Text('Facturar'),
-        ),
-      ],
+    final results = await connection.execute(
+      "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
     );
-  },
-);
 
-  } else {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Cliente no encontrado'),
-          content: const Text('No se encontró ningún cliente con la cédula proporcionada.'),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cerrar'),
+    await connection.close();
+
+    if (results.isNotEmpty) {
+      final clienteInfo = results.first;
+
+      final columnNames = [
+        'Cedula',
+        'Nombre',
+        'Apellido',
+        'Direccion',
+        'Telefono',
+        'Correo'
+      ];
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Información del Cliente'),
+            content: Column(
+              children: [
+                ...clienteInfo.asMap().entries.map(
+                      (entry) => ListTile(
+                        title:
+                            Text('${columnNames[entry.key]}: ${entry.value}'),
+                      ),
+                    ),
+              ],
             ),
-          ],
-        );
-      },
-    );
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cerrar'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await facturarCliente();
+
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Facturar'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Cliente no encontrado'),
+            content: const Text(
+                'No se encontró ningún cliente con la cédula proporcionada.'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cerrar'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
-}
-
-
-
 
   void _mostrarFormularioRegistroCliente() {
     showDialog(
@@ -162,23 +166,28 @@ showDialog(
               children: [
                 TextField(
                   controller: nombreController,
-                  decoration: const InputDecoration(labelText: 'Nombre del Cliente'),
+                  decoration:
+                      const InputDecoration(labelText: 'Nombre del Cliente'),
                 ),
                 TextField(
                   controller: apellidoController,
-                  decoration: const InputDecoration(labelText: 'Apellido del Cliente'),
+                  decoration:
+                      const InputDecoration(labelText: 'Apellido del Cliente'),
                 ),
                 TextField(
                   controller: direccionController,
-                  decoration: const InputDecoration(labelText: 'Dirección del Cliente'),
+                  decoration:
+                      const InputDecoration(labelText: 'Dirección del Cliente'),
                 ),
                 TextField(
                   controller: telefonoController,
-                  decoration: const InputDecoration(labelText: 'Teléfono del Cliente'),
+                  decoration:
+                      const InputDecoration(labelText: 'Teléfono del Cliente'),
                 ),
                 TextField(
                   controller: correoController,
-                  decoration: const InputDecoration(labelText: 'Correo del Cliente'),
+                  decoration:
+                      const InputDecoration(labelText: 'Correo del Cliente'),
                 ),
               ],
             ),
@@ -206,34 +215,33 @@ showDialog(
     );
   }
 
-Future<void> facturarCliente() async {
-  final connection = await DatabaseConnection.instance.openConnection();
-  final globalState = Provider.of<GlobalState>(context, listen: false);
+  Future<void> facturarCliente() async {
+    final connection = await DatabaseConnection.instance.openConnection();
+    final globalState = Provider.of<GlobalState>(context, listen: false);
 
-  await connection.execute(
-    "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision) VALUES "
-"('${cedulaController.text}', 1, $globalState.Total, '${DateTime.now().toLocal()}')",
-  );
+    await connection.execute(
+      "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision) VALUES "
+      "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}')",
+    );
 
 //idPed
 
-  await connection.close();
+    await connection.close();
 
-  print('Cliente facturado con éxito');
-}
+    print('Cliente facturado con éxito');
+  }
 
-Future<void> registrarNuevoCliente() async {
-  final connection = await DatabaseConnection.instance.openConnection();
+  Future<void> registrarNuevoCliente() async {
+    final connection = await DatabaseConnection.instance.openConnection();
 
-  await connection.execute(
-    "INSERT INTO clientes (ced_cli, nom_cli, ape_cli, dir_cli, tel_cli, cor_cli) VALUES "
-    "('${cedulaController.text}', '${nombreController.text}', '${apellidoController.text}', "
-    "'${direccionController.text}', '${telefonoController.text}', '${correoController.text}')",
-  );
+    await connection.execute(
+      "INSERT INTO clientes (ced_cli, nom_cli, ape_cli, dir_cli, tel_cli, cor_cli) VALUES "
+      "('${cedulaController.text}', '${nombreController.text}', '${apellidoController.text}', "
+      "'${direccionController.text}', '${telefonoController.text}', '${correoController.text}')",
+    );
 
-  await connection.close();
-}
-
+    await connection.close();
+  }
 }
 
 void main() {
