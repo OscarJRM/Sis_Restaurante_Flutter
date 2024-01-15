@@ -22,19 +22,16 @@ class PaypalPaymentDemo extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => PaypalCheckoutView(
                   sandboxMode: true,
-                  clientId:
-                      "AYMgb0omsVCczLsG2hCYo9ZPB7bizff_JXI25ZuO-LXKdJc8zWOxiGYr-BcSmAgoTsx0mXq4PkoTD0mt",
-                  secretKey:
-                      "ECufueUM6jMOTwgwc8y7nbkm6HQ9ynzd71e45F0nTa2dbqALFYrGCbT0EQxp91yk_VMtg-POqOwtNddy",
+                  clientId: "",
+                  secretKey: "",
                   transactions: const [
                     {
+                      
                       "amount": {
                         "total": '100',
                         "currency": "USD",
                         "details": {
                           "subtotal": '100',
-                          "shipping": '0',
-                          "shipping_discount": 0
                         }
                       },
                       "description": "The payment transaction description.",
