@@ -2,6 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+import '../BaseDatos/conexion.dart';
+
 
 void main() {
   runApp(const PaypalPaymentDemo());
@@ -13,59 +17,56 @@ class PaypalPaymentDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PaypalPaymentDemp',
+      title: 'PaypalPaymentDemo',
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
           child: TextButton(
-            onPressed: () {
+            onPressed: () async {
+              final connection = await DatabaseConnection.instance.openConnection();
+              final globalState = Provider.of<GlobalState>(context, listen: false);
+
+              final resultsPlatos = await connection.execute(
+                "SELECT productos.nom_pro, detalle_pedidos.can_pro_ped, productos.pre_uni_pro FROM detalle_pedidos "
+                "INNER JOIN productos ON detalle_pedidos.id_pro_ped = productos.id_pro "
+                "WHERE detalle_pedidos.id_ped_per = ${globalState.idPed}",
+              );
+
+              final detallesPlatos = resultsPlatos.map((detalle) {
+                return [
+                  detalle[0],
+                  detalle[1],
+                  detalle[2],
+                ];
+              }).toList();
+
+              final total = globalState.Total.toString();
+
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => PaypalCheckoutView(
                   sandboxMode: true,
                   clientId: "",
                   secretKey: "",
-                  transactions: const [
+                  transactions: [
                     {
-                      
                       "amount": {
-                        "total": '100',
+                        "total": total,
                         "currency": "USD",
                         "details": {
-                          "subtotal": '100',
+                          "subtotal": total,
                         }
                       },
-                      "description": "The payment transaction description.",
-                      // "payment_options": {
-                      //   "allowed_payment_method":
-                      //       "INSTANT_FUNDING_SOURCE"
-                      // },
+                      "description": "Pago de la orden.",
                       "item_list": {
                         "items": [
-                          {
-                            "name": "Apple",
-                            "quantity": 4,
-                            "price": '10',
-                            "currency": "USD"
-                          },
-                          {
-                            "name": "Pineapple",
-                            "quantity": 5,
-                            "price": '12',
-                            "currency": "USD"
-                          }
+                          for (var detallePlato in detallesPlatos)
+                            {
+                              "Nombre": detallePlato[0],
+                              "Cantidad": detallePlato[1],
+                              "Total": (double.parse(detallePlato[1].toString()) * double.parse(detallePlato[2].toString())).toStringAsFixed(2),
+                              "currency": "USD"
+                            },
                         ],
-
-                        // Optional
-                        //   "shipping_address": {
-                        //     "recipient_name": "Tharwat samy",
-                        //     "line1": "tharwat",
-                        //     "line2": "",
-                        //     "city": "tharwat",
-                        //     "country_code": "EG",
-                        //     "postal_code": "25025",
-                        //     "phone": "+00000000",
-                        //     "state": "ALex"
-                        //  },
                       }
                     }
                   ],
@@ -85,7 +86,7 @@ class PaypalPaymentDemo extends StatelessWidget {
                 ),
               ));
             },
-            child: const Text('Pay with paypal'),
+            child: const Text('Pay with PayPal'),
           ),
         ),
       ),
