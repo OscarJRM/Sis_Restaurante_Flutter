@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 // Importa tu clase PagoEfectivo
 import './pagoEfectivo.dart';
+import './pagoPaypal.dart';
 
 class MetodosPago extends StatelessWidget {
   @override
@@ -17,7 +18,7 @@ class MetodosPago extends StatelessWidget {
           style: GoogleFonts.roboto(color: Colors.yellow),
         ),
         backgroundColor: Colors.black, 
-        centerTitle: true, 
+        
       ),
       backgroundColor: Colors.black, // Fondo negro
       body: Center(
@@ -45,8 +46,10 @@ class MetodosPago extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
-                // Lógica para el pago con PayPal
-                // ignore: avoid_print
+                Navigator.push(
+                context, 
+                 MaterialPageRoute(builder: (context) => PaypalPaymentDemo()),
+                );
                 print('Pago con PayPal');
               },
               style: ElevatedButton.styleFrom(
