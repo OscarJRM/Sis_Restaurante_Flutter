@@ -142,7 +142,6 @@ class _PedidoWidgetState extends State<PedidoWidget> {
     // Escuchar el evento "message" en el contexto actual
     final globalState = Provider.of<GlobalState>(context, listen: false);
     globalState.socket?.on("message", (data) async {
-      _mostrarSnackbar(context, "Recibido mensaje");
       print(data);
       productos = await cargarProductos(pedidoId);
       _productosController
