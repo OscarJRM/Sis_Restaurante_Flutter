@@ -11,7 +11,7 @@ void main() {
 }
 
 class PaypalPaymentDemo extends StatelessWidget {
-  const PaypalPaymentDemo({super.key});
+  const PaypalPaymentDemo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +57,29 @@ class PaypalPaymentDemo extends StatelessWidget {
 
     final total = globalState.Total.toString();
 
+    // Actualizar estado del pedido y mesa después de obtener el resultado de PayPal
+    await connection.execute(
+      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
+    );
+
+    // Obtener el número de mesa del pedido
+    final resultsMesa = await connection.execute(
+      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
+    );
+
+    if (resultsMesa.isNotEmpty) {
+      final numMesa = resultsMesa.first[0];
+
+      await connection.execute(
+        "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
+      );
+    }
+
     Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) => PaypalCheckoutView(
         sandboxMode: true,
-        clientId: "",
-        secretKey: "",
+        clientId: "AYMgb0omsVCczLsG2hCYo9ZPB7bizff_JXI25ZuO-LXKdJc8zWOxiGYr-BcSmAgoTsx0mXq4PkoTD0mt",
+        secretKey: "ECufueUM6jMOTwgwc8y7nbkm6HQ9ynzd71e45F0nTa2dbqALFYrGCbT0EQxp91yk_VMtg-POqOwtNddy",
         transactions: [
           {
             "amount": {
