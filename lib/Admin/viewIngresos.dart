@@ -31,7 +31,7 @@ class _IngresosPage extends State<IngresosPage> {
     'Diciembre'
   ];
   double valorIngresado = 0;
-  double valorMaximo = 40000;
+  double valorMaximo = 10000;
   List<String> yearItems = ['2023', '2024'];
 
   @override
@@ -159,7 +159,7 @@ class _IngresosPage extends State<IngresosPage> {
   Future<double> obtenerIngreso() async {
     final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute(
-        'select sum(monto_total) from facturas where EXTRACT(Month FROM fecha_emision) =$selectedNMes and EXTRACT(year FROM fecha_emision)=$selectedYear;');
+        'select sum(m.tot_ped) from maestro_pedidos as m INNER JOIN facturas AS f ON EXTRACT(Month FROM f.fecha_emision) =$selectedNMes and EXTRACT(year FROM f.fecha_emision)=$selectedYear and m.id_ped=f.id_ped_per;');
 
     final List<double> ingresos = results
         .map((row) {

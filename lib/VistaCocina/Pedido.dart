@@ -280,8 +280,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
   Future<void> cargarPedidos() async {
     print("Cargando pedidos");
     final connection = await DatabaseConnection.instance.openConnection();
-    final results = await connection
-        .execute('SELECT * FROM MAESTRO_PEDIDOS WHERE ID_EST_PED<>\'DES\'');
+    final results = await connection.execute(
+        "SELECT * FROM MAESTRO_PEDIDOS WHERE id_est_ped != 'DES' order by id_ped ASC");
 
     final List<Pedido> pedidosList = results.map((row) {
       return Pedido(
