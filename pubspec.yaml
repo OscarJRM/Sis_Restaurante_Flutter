@@ -29,6 +29,7 @@ dependencies:
   soundpool: ^2.3.0
   responsive_builder: ^0.7.0
   fl_chart: ^0.66.0
+  awesome_notifications: ^0.8.2
 
 dev_dependencies:
   flutter_test:
