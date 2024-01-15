@@ -225,6 +225,23 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     final connection = await DatabaseConnection.instance.openConnection();
     final globalState = Provider.of<GlobalState>(context, listen: false);
 
+      await connection.execute(
+    "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
+  );
+
+  // Obtener el número de mesa del pedido
+  final resultsMesa = await connection.execute(
+    "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
+  );
+
+  if (resultsMesa.isNotEmpty) {
+    final numMesa = resultsMesa.first[0];
+
+    await connection.execute(
+      "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
+    );
+  }
+
     final results = await connection.execute(
       "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
     );
@@ -241,13 +258,6 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
         'Correo'
       ];
 
-      final columnNamesDetalles = [
-        'Nombre Plato',
-        'Cantidad',
-        'Precio Unitario',
-        // Agrega otras columnas según sea necesario
-      ];
-
       final resultsPlatos = await connection.execute(
         "SELECT productos.nom_pro, detalle_pedidos.can_pro_ped, productos.pre_uni_pro FROM detalle_pedidos "
         "INNER JOIN productos ON detalle_pedidos.id_pro_ped = productos.id_pro "
@@ -262,7 +272,7 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
           // Agrega otras columnas según sea necesario
         ];
       }).toList();
-
+      
       // Crear el PDF
       final pdf = pw.Document();
 
@@ -281,7 +291,7 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
                         pw.Text('${columnNames[entry.key]}: ${entry.value}'),
                   ),
               pw.SizedBox(height: 12),
-              pw.Text('Monto Total: \$${globalState.Total}}'),
+              pw.Text('Monto Total: \$${globalState.Total}'),
               pw.Text(
                   'Fecha de Emisión: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())}'),
               pw.SizedBox(height: 12),
