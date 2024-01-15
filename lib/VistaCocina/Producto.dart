@@ -141,7 +141,6 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                       estado = 'Listo';
                     }
 
-                    // Aquí puedes almacenar el estado en una variable si es necesario
                     print('Estado actual del producto: $estado');
                   });
                 },

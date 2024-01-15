@@ -4,7 +4,10 @@ import 'package:sistema_restaurante/Admin/viewPedidos.dart';
 import 'package:sistema_restaurante/Admin/viewVentas.dart';
 
 class ReportesScreen extends StatefulWidget {
+  const ReportesScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -12,9 +15,9 @@ class _MyHomePageState extends State<ReportesScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    VentasPage(),
-    PedidosPage(),
-    IngresosPage(),
+    const VentasPage(),
+    const PedidosPage(),
+    const IngresosPage(),
   ];
 
   void _onItemTapped(int index) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:sistema_restaurante/Admin/ContentNavigator.dart';
+import 'package:sistema_restaurante/Admin/listaVentas.dart';
 import 'package:sistema_restaurante/Admin/reportes.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/src/login.dart';
@@ -37,10 +38,6 @@ class _menuAdmin extends State<vistaAdmin> {
       builder: (context, sizingInformation) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text(
-              "Bienvenido a Gerencia",
-              style: TextStyle(color: Colors.white),
-            ),
             centerTitle: true,
             backgroundColor: const Color.fromARGB(255, 26, 27, 29),
             iconTheme: const IconThemeData(color: Colors.white),
@@ -114,10 +111,10 @@ class _menuAdmin extends State<vistaAdmin> {
               Widget page;
               switch (settings.name) {
                 case '/registro_ventas':
-                  page = ReportesScreen();
+                  page = const VentasScreen();
                   break;
                 case '/reportes':
-                  page = ReportesScreen();
+                  page = const ReportesScreen();
                   break;
                 default:
                   page =
