@@ -89,36 +89,58 @@ class _menuCarritoState extends State<menuCarrito> {
               // Puedes realizar acciones adicionales aquí para finalizar el pedido
               final conn = await DatabaseConnection.instance.openConnection();
               final results = await conn.execute(
-                'SELECT TOT_PED FROM MAESTRO_PEDIDOS WHERE ID_PED  = \$1',
+                'SELECT ID_EST_PED FROM MAESTRO_PEDIDOS WHERE ID_PED  = \$1',
                 parameters: [globalState.idPed],
               );
               await conn.close();
+              print(results.toString());
 
-              if (results.isNotEmpty) {
-                String totalPedido = results.first[0] as String;
-                final globalState =
-                    Provider.of<GlobalState>(context, listen: false);
-                globalState.updateTotal(totalPedido);
-                // Ahora, puedes hacer lo que quieras con la variable totalPedido
-                print('Total del pedido: $totalPedido');
+              if (results.toString() == "LIS") {
+                final conn2 =
+                    await DatabaseConnection.instance.openConnection();
 
-                // También puedes enviar el totalPedido a través de Provider
+                final results2 = await conn2.execute(
+                  'SELECT TOT_PED FROM MAESTRO_PEDIDOS WHERE ID_PED  = \$1',
+                  parameters: [globalState.idPed],
+                );
+                await conn2.close();
+
+                if (results.isNotEmpty) {
+                  String totalPedido = results.first[0] as String;
+                  final globalState =
+                      Provider.of<GlobalState>(context, listen: false);
+                  globalState.updateTotal(totalPedido);
+                  // Ahora, puedes hacer lo que quieras con la variable totalPedido
+                  print('Total del pedido: $totalPedido');
+
+                  // También puedes enviar el totalPedido a través de Provider
+                } else {
+                  print('No se encontró el pedido');
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MetodosPago(),
+                  ),
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Pedido finalizado'),
+                    backgroundColor: Colors.blue,
+                  ),
+                );
               } else {
+                // Show SnackBar when results are not a List
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('El pedido no está listo para ser despachado'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
                 print('No se encontró el pedido');
               }
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MetodosPago(),
-                ),
-              );
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Pedido finalizado'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
             },
             backgroundColor: Colors.blue,
             child: const Icon(FeatherIcons.check, color: Colors.white),
