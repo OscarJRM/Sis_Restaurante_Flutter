@@ -4,9 +4,42 @@ import 'package:sistema_restaurante/services/web_socket_client.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Pedido.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class Vista extends StatelessWidget {
+class Vista extends StatefulWidget {
   const Vista({super.key});
+
+  @override
+  State<Vista> createState() => _VistaState();
+}
+
+class _VistaState extends State<Vista> {
+  late IO.Socket _socket;
+
+  _sendMessage(String pedido) {
+    _socket.emit('message', {'message': pedido, 'sender': "cocina"});
+  }
+
+  _connectSocket() {
+    _socket.onConnect((data) => print('Connected'));
+    _socket.onConnectError((data) => print('Error $data'));
+    _socket.onDisconnect((data) => print('Disconnected'));
+
+    _socket.on("message", (data) => print(data));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _socket = IO.io(
+        'https://sistemarestaurante.webpubsub.azure.com',
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .setPath("/clients/socketio/hubs/Centro")
+            .setQuery({'username': "cocina"})
+            .build());
+    _connectSocket();
+  }
 
   @override
   Widget build(BuildContext context) {
