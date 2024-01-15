@@ -21,7 +21,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
   late IO.Socket _socket;
 
   _sendMessage(String pedido) {
-    _socket.emit('message', {'message': pedido, 'sender': widget._name});
+    _socket.emit("message", {'message': pedido, 'sender': widget._name});
   }
 
   _connectSocket() {
@@ -40,6 +40,8 @@ class _menuPedidos1State extends State<menuPedidos1> {
             .setPath("/clients/socketio/hubs/Centro")
             .setQuery({'username': widget._cedula})
             .build());
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.updatesocket(_socket);
     _connectSocket();
   }
 
@@ -76,14 +78,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        actions: [
-          SizedBox(width: 20.0),
-          IconButton(
-              onPressed: () {
-                _sendMessage("1");
-              },
-              icon: Icon(Icons.notification_add))
-        ],
+        actions: const [SizedBox(width: 20.0)],
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);

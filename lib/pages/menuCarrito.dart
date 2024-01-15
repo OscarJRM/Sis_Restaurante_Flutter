@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:sistema_restaurante/models/platos.dart';
 import 'package:sistema_restaurante/vistaFacturas/MetodosPagos.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Carrito {
   final WebSocketChannel webSocketClient;
@@ -40,6 +41,11 @@ class _menuCarritoState extends State<menuCarrito> {
      void _sendMessage() async {
     webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
   }*/
+
+  _sendMessage(String cedula, String pedido, IO.Socket? _socket) {
+    _socket?.emit("message", {'message': pedido, 'sender': cedula});
+  }
+
   @override
   Widget build(BuildContext context) {
     final globalState = Provider.of<GlobalState>(context, listen: false);
@@ -62,10 +68,11 @@ class _menuCarritoState extends State<menuCarrito> {
                 );
 
                 await conn.close();
-
+                _sendMessage(
+                    globalState.cedEmpAti, "Enviado", globalState.socket);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Estado del pedido actualizado a "PEN"'),
+                    content: Text('Pedido enviado a cocina'),
                     backgroundColor: Colors.green,
                   ),
                 );

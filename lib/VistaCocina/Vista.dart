@@ -14,32 +14,8 @@ class Vista extends StatefulWidget {
 }
 
 class _VistaState extends State<Vista> {
-  late IO.Socket _socket;
 
-  _sendMessage(String pedido) {
-    _socket.emit('message', {'message': pedido, 'sender': "cocina"});
-  }
-
-  _connectSocket() {
-    _socket.onConnect((data) => print('Connected'));
-    _socket.onConnectError((data) => print('Error $data'));
-    _socket.onDisconnect((data) => print('Disconnected'));
-
-    _socket.on("message", (data) => print(data));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _socket = IO.io(
-        'https://sistemarestaurante.webpubsub.azure.com',
-        IO.OptionBuilder()
-            .setTransports(['websocket'])
-            .setPath("/clients/socketio/hubs/Centro")
-            .setQuery({'username': "cocina"})
-            .build());
-    _connectSocket();
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
