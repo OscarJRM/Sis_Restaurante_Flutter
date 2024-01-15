@@ -4,9 +4,18 @@ import 'package:sistema_restaurante/services/web_socket_client.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Pedido.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class Vista extends StatelessWidget {
+class Vista extends StatefulWidget {
   const Vista({super.key});
+
+  @override
+  State<Vista> createState() => _VistaState();
+}
+
+class _VistaState extends State<Vista> {
+
+ 
 
   @override
   Widget build(BuildContext context) {
