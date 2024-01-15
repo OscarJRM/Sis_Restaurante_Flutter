@@ -150,9 +150,8 @@ class _PedidoWidgetState extends State<PedidoWidget> {
       _productosController
           .add(productos); // Agrega los nuevos productos al stream
       if (mounted) {
-        setState(() {
-          print("Recibido mensaje, recargando productos");
-        });
+        setState(() {});
+        print("carga");
       }
     });
 

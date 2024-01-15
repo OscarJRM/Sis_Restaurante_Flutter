@@ -89,9 +89,9 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         final conn =
                             await DatabaseConnection.instance.openConnection();
                         await conn.execute(
-                          'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1, EST_PRO_PED = \$2 WHERE ID_PED_PER = \$3 AND ID_PRO_PED = \$4',
+                          r'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = $1, EST_PRO_PED = $2 WHERE ID_PED_PER = $3 AND ID_PRO_PED = $4',
                           parameters: [
-                            nuevaCantidad.toString(),
+                            nuevaCantidad,
                             'PEN',
                             globalState.idPed,
                             widget.plato.idPro,
@@ -142,8 +142,16 @@ class _carritoCustom2State extends State<carritoCustom2> {
                         final conn =
                             await DatabaseConnection.instance.openConnection();
                         await conn.execute(
-                          'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = \$1, EST_PRO_PED = \$2 WHERE ID_PED_PER = \$3 AND ID_PRO_PED = \$4',
+                          r'UPDATE DETALLE_PEDIDOS SET CAN_PRO_PED = $1, EST_PRO_PED = $2 WHERE ID_PED_PER = $3 AND ID_PRO_PED = $4',
                           parameters: [
+                            nuevaCantidad,
+                            'PEN',
+                            globalState.idPed,
+                            widget.plato.idPro,
+                          ],
+                        );
+                        print(
+                          [
                             nuevaCantidad.toString(),
                             'PEN',
                             globalState.idPed,
