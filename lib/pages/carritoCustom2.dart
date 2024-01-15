@@ -37,6 +37,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
             CachedNetworkImage(
               imageUrl: widget.plato.urlImg,
               height: 100,
+              width: 230,
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
                 height: 100,
