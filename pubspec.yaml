@@ -12,6 +12,7 @@ dependencies:
   feather_icons: ^1.2.0
   flutter:
     sdk: flutter
+  font_awesome_flutter: ^10.6.0
   google_fonts: ^6.1.0
   postgres: ^3.0.3
   provider: ^6.1.1
