@@ -269,7 +269,6 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
           detalle[0],
           detalle[1],
           detalle[2],
-          // Agrega otras columnas según sea necesario
         ];
       }).toList();
 
