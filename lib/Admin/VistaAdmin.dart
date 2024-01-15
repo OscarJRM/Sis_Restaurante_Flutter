@@ -39,6 +39,10 @@ class _menuAdmin extends State<vistaAdmin> {
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
+            titleTextStyle: const TextStyle(color: Colors.white, fontSize: 25),
+            title: const Text(
+              'GERENCIA',
+            ),
             backgroundColor: const Color.fromARGB(255, 26, 27, 29),
             iconTheme: const IconThemeData(color: Colors.white),
           ),

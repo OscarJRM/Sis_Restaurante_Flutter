@@ -1,7 +1,5 @@
 // ignore_for_file: file_names
 
-import 'dart:ffi';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +23,7 @@ class VentasPage extends StatefulWidget {
 class _VentasPageState extends State<VentasPage> {
   DateTime selectedDateInicio = DateTime.now();
   DateTime selectedDateFin = DateTime.now();
-
+  List<ProductoData> fechasVenta = [];
   Future<void> _selectDate(BuildContext context, String tipo) async {
     if (tipo == 'inicio') {
       final DateTime? picked = await showDatePicker(
@@ -59,7 +57,7 @@ class _VentasPageState extends State<VentasPage> {
   Future<void> _showLineChartDialog(
       BuildContext context, Future<List<FlSpot>> Function() getData) async {
     final List<FlSpot> lineChartData = await getData();
-    final List<ProductoData> fechasVenta = await cargarProductos();
+    fechasVenta = await cargarProductos();
 
     // ignore: use_build_context_synchronously
     showDialog(
@@ -71,7 +69,9 @@ class _VentasPageState extends State<VentasPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Reporte de Ventas'),
+                const Text('Reporte de Ventas',
+                    style:
+                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 30.0),
                 SizedBox(
                   width: 800,
@@ -80,8 +80,8 @@ class _VentasPageState extends State<VentasPage> {
                     LineChartData(
                       gridData: const FlGridData(show: true),
                       minY: 0,
-                      titlesData: const FlTitlesData(
-                          leftTitles: AxisTitles(
+                      titlesData: FlTitlesData(
+                          leftTitles: const AxisTitles(
                             axisNameSize: 20,
                             axisNameWidget: Text('Pedidos Vendidos'),
                             sideTitles: SideTitles(
@@ -90,18 +90,20 @@ class _VentasPageState extends State<VentasPage> {
                               reservedSize: 50,
                             ),
                           ),
-                          rightTitles: AxisTitles(
+                          rightTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
                           ),
-                          topTitles: AxisTitles(
+                          topTitles: const AxisTitles(
+                            axisNameSize: 20,
+                            axisNameWidget: Text('Fecha de Venta'),
                             sideTitles: SideTitles(showTitles: false),
                           ),
                           bottomTitles: AxisTitles(
-                            axisNameSize: 20,
-                            axisNameWidget: Text('Fecha de Venta'),
                             sideTitles: SideTitles(
-                              showTitles: false,
-                              reservedSize: 30,
+                              showTitles: true,
+                              reservedSize: 75,
+                              interval: 1,
+                              getTitlesWidget: getTitles,
                             ),
                           )),
                       borderData: FlBorderData(show: true),
@@ -147,6 +149,21 @@ class _VentasPageState extends State<VentasPage> {
         );
       },
     );
+  }
+
+  Widget getTitles(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+    );
+    String text = fechasVenta[int.parse(value.toStringAsFixed(0))].nombre;
+    return SideTitleWidget(
+        axisSide: meta.axisSide,
+        space: 4,
+        child: RotatedBox(
+          quarterTurns: 3,
+          child: Text(text, style: style),
+        ));
   }
 
   Future<List<ProductoData>> cargarProductos() async {
