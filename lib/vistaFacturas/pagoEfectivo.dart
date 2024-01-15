@@ -329,8 +329,8 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
       // Actualizar la base de datos con la ruta del PDF
       final pdfPath = pdfFile.path;
       await connection.execute(
-        "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision, pdf_path) VALUES "
-        "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}', '$pdfPath')",
+        "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision, pdf_path, id_ped_per) VALUES "
+        "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}', '$pdfPath', ${globalState.idPed})",
       );
 
       await connection.close();
