@@ -94,8 +94,8 @@ class _menuCarritoState extends State<menuCarrito> {
               );
               await conn.close();
               print(results.toString());
-
-              if (results.toString() == "LIS") {
+              print(results.toString() == "[[LIS]]");
+              if (results.toString() == "[[LIS]]") {
                 final conn2 =
                     await DatabaseConnection.instance.openConnection();
 
@@ -105,8 +105,8 @@ class _menuCarritoState extends State<menuCarrito> {
                 );
                 await conn2.close();
 
-                if (results.isNotEmpty) {
-                  String totalPedido = results.first[0] as String;
+                if (results2.isNotEmpty) {
+                  String totalPedido = results2.first[0] as String;
                   final globalState =
                       Provider.of<GlobalState>(context, listen: false);
                   globalState.updateTotal(totalPedido);
