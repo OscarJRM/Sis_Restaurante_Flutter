@@ -28,6 +28,14 @@ class _menuPedidos1State extends State<menuPedidos1> {
     _socket.onConnect((data) => print('Connected'));
     _socket.onConnectError((data) => print('Error $data'));
     _socket.onDisconnect((data) => print('Disconnected'));
+    _socket.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          print("carga");
+        });
+      }
+    });
   }
 
   @override

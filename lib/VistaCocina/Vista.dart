@@ -4,6 +4,8 @@ import 'package:sistema_restaurante/services/web_socket_client.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Pedido.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Vista extends StatefulWidget {
@@ -15,7 +17,7 @@ class Vista extends StatefulWidget {
 
 class _VistaState extends State<Vista> {
 
- 
+  
 
   @override
   Widget build(BuildContext context) {
@@ -66,4 +68,12 @@ void main() {
   runApp(const MaterialApp(
     home: Vista(),
   ));
+}
+
+_mostrarSnackbar(BuildContext context, String mensaje) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(mensaje),
+    ),
+  );
 }

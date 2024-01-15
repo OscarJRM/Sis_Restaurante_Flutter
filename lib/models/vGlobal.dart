@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_final_fields
 
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ class GlobalState extends ChangeNotifier {
   String Ape = ''; // Agrega la nueva variable
   double Total = 0.00;
   IO.Socket? socket = null;
+  String json = '';
 
   void updateCedEmpAti(String newCedEmpAti) {
     cedEmpAti = newCedEmpAti;
@@ -38,6 +40,17 @@ class GlobalState extends ChangeNotifier {
 
   void updatesocket(IO.Socket newsocket) {
     socket = newsocket;
+  }
+
+  void updateJson(String newjson) {
+    json = newjson;
+    notifyListeners();
+  }
+  void _connectSocket() {
+    socket?.onConnect((data) => print('Connected'));
+    socket?.onConnectError((data) => print('Error $data'));
+    socket?.onDisconnect((data) => print('Disconnected'));
+
   }
 
   List<Plato> pedidos = [];

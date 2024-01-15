@@ -1,10 +1,14 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../BaseDatos/conexion.dart';
 import 'Producto.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:soundpool/soundpool.dart';
 
 class Pedido {
   int id;
@@ -179,7 +183,14 @@ class _ListaPedidosState extends State<ListaPedidos> {
 
     _socket.on("message", (data) {
       print(data);
-      cargarPedidos();
+      if (mounted) {
+        setState(() {
+          cargarPedidos();
+          print("carga");
+          _mostrarSnackbar(context, "listo");
+          //_sound();
+        });
+      }
     });
   }
 
@@ -194,6 +205,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
             .setQuery({'username': "cocina"})
             .build());
     _connectSocket();
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.updatesocket(_socket);
     cargarPedidos();
   }
 
@@ -291,4 +304,22 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
       },
     );
   }
+}
+
+_mostrarSnackbar(BuildContext context, String mensaje) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(mensaje),
+    ),
+  );
+}
+
+Future<void> _sound() async {
+  Soundpool pool = Soundpool(streamType: StreamType.notification);
+  int soundId = await rootBundle
+      .load("assets/Audio/notify.mp3")
+      .then((ByteData soundData) {
+    return pool.load(soundData);
+  });
+  int streamId = await pool.play(soundId);
 }
