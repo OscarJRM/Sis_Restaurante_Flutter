@@ -37,11 +37,13 @@ class _menuPedidos1State extends State<menuPedidos1> {
           final globalState = Provider.of<GlobalState>(context, listen: false);
           String? cedula = data['cedEmp'];
           int idPed = data['idPed'];
-          int mesa = data['mesa'];
+          int? mesa = data['mesa'];
           String? nombre = data['nombre'];
           String pedido = data['message'];
 
-          if (cedula != null && globalState.cedEmpAti == cedula) {
+          if (cedula != null &&
+              globalState.cedEmpAti == cedula &&
+              mesa != null) {
             AwesomeNotifications().createNotification(
               content: NotificationContent(
                 id: DateTime.now().millisecondsSinceEpoch.remainder(

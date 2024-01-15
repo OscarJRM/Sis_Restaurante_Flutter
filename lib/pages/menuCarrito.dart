@@ -42,8 +42,9 @@ class _menuCarritoState extends State<menuCarrito> {
     webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
   }*/
 
-  _sendMessage(String cedula, String pedido,int idPed, IO.Socket? _socket) {
-    _socket?.emit("message", {'message': pedido, 'sender': cedula,'idPed':idPed});
+  _sendMessage(String cedula, String pedido, int idPed, IO.Socket? _socket) {
+    _socket?.emit(
+        "message", {'message': pedido, 'sender': cedula, 'idPed': idPed});
   }
 
   @override
@@ -68,8 +69,9 @@ class _menuCarritoState extends State<menuCarrito> {
                 );
 
                 await conn.close();
-                _sendMessage(
-                    globalState.cedEmpAti, "Enviado",globalState.idPed, globalState.socket);
+                await conn.close();
+                _sendMessage(globalState.cedEmpAti, "Enviado",
+                    globalState.idPed, globalState.socket);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Pedido enviado a cocina'),
@@ -91,7 +93,7 @@ class _menuCarritoState extends State<menuCarrito> {
                 parameters: [globalState.idPed],
               );
               await conn.close();
-              
+
               if (results.isNotEmpty) {
                 String totalPedido = results.first[0] as String;
                 final globalState =
