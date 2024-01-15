@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_restaurante/BaseDatos/conexion.dart';
 import 'package:sistema_restaurante/models/pedidos.dart';
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Producto {
   String id;
@@ -35,6 +38,10 @@ class ProductoWidget extends StatefulWidget {
 class _ProductoWidgetState extends State<ProductoWidget> {
   late String estado =
       _estadoProducto(widget.producto.estado); // Estado inicial
+
+  _sendMessage(String cedula, String pedido, IO.Socket? _socket) {
+    _socket?.emit("message", {'message': pedido, 'sender': cedula});
+  }
 
   String _estadoProducto(String est) {
     if (est == "PEN") {
@@ -129,6 +136,8 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                 onPressed: () {
                   // Cambiar el estado del producto
                   setState(() {
+                    final globalState =
+                        Provider.of<GlobalState>(context, listen: false);
                     if (estado == 'Espera') {
                       estado = 'Preparando';
                       cambiarEstado(estado, widget.producto.idPedidoPertenece,
@@ -140,8 +149,9 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                     } else {
                       estado = 'Listo';
                     }
+                    _sendMessage(
+                        globalState.cedEmpAti, estado, globalState.socket);
 
-                    // Aquí puedes almacenar el estado en una variable si es necesario
                     print('Estado actual del producto: $estado');
                   });
                 },

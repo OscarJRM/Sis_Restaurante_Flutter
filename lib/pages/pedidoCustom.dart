@@ -7,10 +7,19 @@ import 'package:sistema_restaurante/pages/mesero.dart';
 import 'package:sistema_restaurante/pages/wArgumentos.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class pedidoCustom extends StatelessWidget {
+
+class pedidoCustom extends StatefulWidget {
   final Pedido pedido;
   const pedidoCustom({required this.pedido, super.key});
+
+  @override
+  State<pedidoCustom> createState() => _pedidoCustomState();
+}
+
+class _pedidoCustomState extends State<pedidoCustom> {
+  
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +40,7 @@ class pedidoCustom extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "N°: ${pedido.idPed.toString()}",
+                  "N°: ${widget.pedido.idPed.toString()}",
                   style: GoogleFonts.inter(
                       color: Colors.white,
                       fontSize: 18,
@@ -40,7 +49,7 @@ class pedidoCustom extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      "Mesa: ${pedido.numMesPid}",
+                      "Mesa: ${widget.pedido.numMesPid}",
                       style:
                           GoogleFonts.inter(color: Colors.white, fontSize: 18),
                     )
@@ -49,7 +58,7 @@ class pedidoCustom extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      _obtenerTextoEstado(pedido.idEstPed),
+                      _obtenerTextoEstado(widget.pedido.idEstPed),
                       style: GoogleFonts.inter(
                           color: const Color(0xFF999999),
                           fontSize: 18,
@@ -62,7 +71,7 @@ class pedidoCustom extends StatelessWidget {
                     Builder(builder: (innercontext) {
                       return FilledButton(
                           onPressed: () {
-                            globalState.updateIdPed(pedido.idPed);
+                            globalState.updateIdPed(widget.pedido.idPed);
                             print(globalState.idPed);
                             //Navigator.pushNamed(context, '/menu');
                             Navigator.push(

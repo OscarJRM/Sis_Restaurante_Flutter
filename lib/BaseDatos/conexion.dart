@@ -9,7 +9,7 @@ class DatabaseConnection {
 
   // Método para obtener la única instancia (Singleton)
   static DatabaseConnection get instance {
-    _instance ??= DatabaseConnection._();  // Crea la instancia si aún no existe
+    _instance ??= DatabaseConnection._(); // Crea la instancia si aún no existe
     return _instance!;
   }
 

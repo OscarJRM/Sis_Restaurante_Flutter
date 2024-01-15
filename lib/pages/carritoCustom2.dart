@@ -105,6 +105,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
                           parameters: [globalState.idPed],
                         );
+                        await conn2.close();
                         List<DetallePedido> listaDetallePedido =
                             cargarDetallePedidos(result);
 
@@ -148,6 +149,7 @@ class _carritoCustom2State extends State<carritoCustom2> {
                           "SELECT * from DETALLE_PEDIDOS WHERE ID_PED_PER = \$1",
                           parameters: [globalState.idPed],
                         );
+                        await conn2.close();
                         List<DetallePedido> listaDetallePedido =
                             cargarDetallePedidos(result);
 

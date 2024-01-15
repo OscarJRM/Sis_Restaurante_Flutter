@@ -1,8 +1,12 @@
+// ignore_for_file: prefer_final_fields
+
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/platos.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class GlobalState extends ChangeNotifier {
   String cedEmpAti = '';
@@ -10,6 +14,8 @@ class GlobalState extends ChangeNotifier {
   String Nom = '';
   String Ape = ''; // Agrega la nueva variable
   double Total = 0.00;
+  IO.Socket? socket = null;
+  String json = '';
 
   void updateCedEmpAti(String newCedEmpAti) {
     cedEmpAti = newCedEmpAti;
@@ -30,6 +36,21 @@ class GlobalState extends ChangeNotifier {
 
   void updateTotal(String newTotal) {
     Total = double.parse(newTotal);
+  }
+
+  void updatesocket(IO.Socket newsocket) {
+    socket = newsocket;
+  }
+
+  void updateJson(String newjson) {
+    json = newjson;
+    notifyListeners();
+  }
+  void _connectSocket() {
+    socket?.onConnect((data) => print('Connected'));
+    socket?.onConnectError((data) => print('Error $data'));
+    socket?.onDisconnect((data) => print('Disconnected'));
+
   }
 
   List<Plato> pedidos = [];

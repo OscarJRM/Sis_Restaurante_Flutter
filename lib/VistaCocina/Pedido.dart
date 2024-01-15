@@ -1,9 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../BaseDatos/conexion.dart';
 import 'Producto.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:provider/provider.dart';
+import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:soundpool/soundpool.dart';
 
 class Pedido {
   int id;
@@ -25,11 +32,16 @@ class Pedido {
   });
 }
 
-class PedidoWidget extends StatelessWidget {
+class PedidoWidget extends StatefulWidget {
   final Pedido pedido;
 
   const PedidoWidget({Key? key, required this.pedido}) : super(key: key);
 
+  @override
+  State<PedidoWidget> createState() => _PedidoWidgetState();
+}
+
+class _PedidoWidgetState extends State<PedidoWidget> {
   String _estadoPedido(String estado) {
     if (estado == 'PEN' || estado == 'ENV') {
       return 'Pendiente';
@@ -46,6 +58,20 @@ class PedidoWidget extends StatelessWidget {
     return formattedDateTime;
   }
 
+  _connectSocket() {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+
+    globalState.socket?.onConnect((data) => print('Connected+'));
+    globalState.socket?.onConnectError((data) => print('Error $data'));
+    globalState.socket?.onDisconnect((data) => print('Disconnected'));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _connectSocket();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -56,7 +82,7 @@ class PedidoWidget extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          _mostrarProductos(context, pedido.id);
+          _mostrarProductos(context, widget.pedido.id);
         },
         child: Container(
           width: 150,
@@ -70,7 +96,7 @@ class PedidoWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Pedido #${pedido.id}',
+                  'Pedido #${widget.pedido.id}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -79,7 +105,7 @@ class PedidoWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Fecha y Hora: ${_fechaHoraPedido(pedido.fechaHora)}',
+                  'Fecha y Hora: ${_fechaHoraPedido(widget.pedido.fechaHora)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 /*Text(
@@ -87,15 +113,15 @@ class PedidoWidget extends StatelessWidget {
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),*/
                 Text(
-                  'C.I. Mesero: ${pedido.cedulaEmpleado}',
+                  'C.I. Mesero: ${widget.pedido.cedulaEmpleado}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  'Número de Mesa: ${pedido.numeroMesa}',
+                  'Número de Mesa: ${widget.pedido.numeroMesa}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 Text(
-                  'Estado: ${_estadoPedido(pedido.idEstadoPedido)}',
+                  'Estado: ${_estadoPedido(widget.pedido.idEstadoPedido)}',
                   style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
@@ -107,7 +133,25 @@ class PedidoWidget extends StatelessWidget {
   }
 
   Future<void> _mostrarProductos(BuildContext context, int pedidoId) async {
-    final List<Producto> productos = await cargarProductos(pedidoId);
+    _connectSocket();
+    final _productosController = StreamController<List<Producto>>();
+
+    List<Producto> productos = await cargarProductos(pedidoId);
+    _productosController.add(productos);
+
+    // Escuchar el evento "message" en el contexto actual
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.socket?.on("message", (data) async {
+      print(data);
+      productos = await cargarProductos(pedidoId);
+      _productosController
+          .add(productos); // Agrega los nuevos productos al stream
+      if (mounted) {
+        setState(() {
+          print("Recibido mensaje, recargando productos");
+        });
+      }
+    });
 
     await showDialog(
       context: context,
@@ -116,7 +160,16 @@ class PedidoWidget extends StatelessWidget {
           title: Text('Productos del Pedido #$pedidoId'),
           content: SizedBox(
             width: double.maxFinite,
-            child: ListaProductos(productos: productos),
+            child: StreamBuilder<List<Producto>>(
+              stream: _productosController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListaProductos(productos: snapshot.data!);
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
           ),
           actions: [
             ElevatedButton(
@@ -129,6 +182,12 @@ class PedidoWidget extends StatelessWidget {
         );
       },
     );
+    @override
+    void dispose() {
+      _productosController
+          .close(); // Asegúrate de cerrar el controlador al finalizar
+      super.dispose();
+    }
   }
 
   Future<List<Producto>> cargarProductos(int pedidoId) async {
@@ -165,14 +224,48 @@ class ListaPedidos extends StatefulWidget {
 
 class _ListaPedidosState extends State<ListaPedidos> {
   List<Pedido> pedidos = [];
+  late IO.Socket _socket;
+
+  _sendMessage(String pedido) {
+    _socket.emit('message', {'message': pedido, 'sender': "cocina"});
+  }
+
+  _connectSocket() {
+    _socket.onConnect((data) => print('Connected+'));
+    _socket.onConnectError((data) => print('Error $data'));
+    _socket.onDisconnect((data) => print('Disconnected'));
+
+    _socket.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          cargarPedidos();
+          print("carga");
+          _mostrarSnackbar(context, "listo");
+          //_sound();
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _socket = IO.io(
+        'https://sistemarestaurante.webpubsub.azure.com',
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .setPath("/clients/socketio/hubs/Centro")
+            .setQuery({'username': "cocina"})
+            .build());
+    _connectSocket();
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.updatesocket(_socket);
     cargarPedidos();
   }
 
   Future<void> cargarPedidos() async {
+    print("Cargando pedidos");
     final connection = await DatabaseConnection.instance.openConnection();
     final results = await connection.execute('SELECT * FROM MAESTRO_PEDIDOS');
 
@@ -221,10 +314,29 @@ class ListaProductosPedido extends StatefulWidget {
 
 class _ListaProductosPedidoState extends State<ListaProductosPedido> {
   List<Producto> productos = [];
+  _connectSocket() {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    print("2");
+    globalState.socket?.onConnect((data) => print('Connected+'));
+    globalState.socket?.onConnectError((data) => print('Error $data'));
+    globalState.socket?.onDisconnect((data) => print('Disconnected'));
+
+    globalState.socket?.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          print("carga pedidos");
+          cargarProductosPedido();
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _connectSocket();
+    print("1");
     cargarProductosPedido();
   }
 
@@ -246,6 +358,7 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
     }).toList();
 
     setState(() {
+      print("Si");
       productos = productosList;
     });
 
@@ -265,4 +378,22 @@ class _ListaProductosPedidoState extends State<ListaProductosPedido> {
       },
     );
   }
+}
+
+_mostrarSnackbar(BuildContext context, String mensaje) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(mensaje),
+    ),
+  );
+}
+
+Future<void> _sound() async {
+  Soundpool pool = Soundpool(streamType: StreamType.notification);
+  int soundId = await rootBundle
+      .load("assets/Audio/notify.mp3")
+      .then((ByteData soundData) {
+    return pool.load(soundData);
+  });
+  int streamId = await pool.play(soundId);
 }

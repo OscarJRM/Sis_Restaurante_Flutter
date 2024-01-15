@@ -1,5 +1,7 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import "package:feather_icons/feather_icons.dart";
 import "package:flutter/material.dart";
+import 'package:sistema_restaurante/Notification_Controller.dart';
 import "package:sistema_restaurante/pages/Pedidos.dart";
 import "package:sistema_restaurante/pages/wArgumentos.dart";
 import 'Pedidos.dart';
@@ -21,17 +23,44 @@ class _menuPedidos1State extends State<menuPedidos1> {
   late IO.Socket _socket;
 
   _sendMessage(String pedido) {
-    _socket.emit('message', {'message': pedido, 'sender': widget._name});
+    _socket.emit("message", {'message': pedido, 'sender': widget._name});
   }
 
   _connectSocket() {
     _socket.onConnect((data) => print('Connected'));
     _socket.onConnectError((data) => print('Error $data'));
     _socket.onDisconnect((data) => print('Disconnected'));
+    _socket.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          print("cargatraka");
+          AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: DateTime.now()
+                  .millisecondsSinceEpoch
+                  .remainder(2147483647), // Usar la hora actual como ID único,
+              channelKey: 'basic_channel',
+              title: 'Notificación',
+              body: 'Esta es una notificación' + data.toString(),
+            ),
+          );
+        });
+      }
+    });
   }
 
   @override
   void initState() {
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
+    );
     super.initState();
     _socket = IO.io(
         'https://sistemarestaurante.webpubsub.azure.com',
@@ -40,6 +69,8 @@ class _menuPedidos1State extends State<menuPedidos1> {
             .setPath("/clients/socketio/hubs/Centro")
             .setQuery({'username': widget._cedula})
             .build());
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+    globalState.updatesocket(_socket);
     _connectSocket();
   }
 
@@ -80,9 +111,16 @@ class _menuPedidos1State extends State<menuPedidos1> {
           SizedBox(width: 20.0),
           IconButton(
               onPressed: () {
-                _sendMessage("1");
+                AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                    id: 1,
+                    channelKey: 'basic_channel',
+                    title: 'Notificación',
+                    body: 'Esta es una notificación',
+                  ),
+                );
               },
-              icon: Icon(Icons.notification_add))
+              icon: Icon(FeatherIcons.bell)),
         ],
         leading: IconButton(
             onPressed: () {

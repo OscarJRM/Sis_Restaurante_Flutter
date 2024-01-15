@@ -44,7 +44,7 @@ class _productoCustomState extends State<productoCustom> {
     final result = await conn.execute(
         'SELECT COUNT(*) FROM DETALLE_PEDIDOS WHERE ID_PED_PER = \$1 AND ID_PRO_PED = \$2',
         parameters: [globalState.idPed, widget.plato.idPro]);
-
+    await conn.close();
     // El resultado debería ser una lista con un único valor entero
     if (result.isNotEmpty &&
         result[0][0] != null &&
@@ -139,6 +139,7 @@ class _productoCustomState extends State<productoCustom> {
                               cantidad,
                             ],
                           );
+                           await conn.close();
 
                           // Mostrar la notificación en el SnackBar
                           const snackBar = SnackBar(

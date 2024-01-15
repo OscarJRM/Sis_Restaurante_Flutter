@@ -4,6 +4,7 @@ import '../models/pedidos.dart';
 import 'pedidoCustom.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/vGlobal.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Pedidos extends StatefulWidget {
   const Pedidos({Key? key}) : super(key: key);
@@ -16,9 +17,28 @@ class _PedidosState extends State<Pedidos> {
   late List<Pedido> listaPedidos = [];
   late bool isFetchingData = false;
 
+  _connectSocket() {
+    final globalState = Provider.of<GlobalState>(context, listen: false);
+
+    globalState.socket?.onConnect((data) => print('Connected+'));
+    globalState.socket?.onConnectError((data) => print('Error $data'));
+    globalState.socket?.onDisconnect((data) => print('Disconnected'));
+
+    globalState.socket?.on("message", (data) {
+      print(data);
+      if (mounted) {
+        setState(() {
+          print("carga");
+          _fetchData();
+        });
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _connectSocket();
     _fetchData();
   }
 
