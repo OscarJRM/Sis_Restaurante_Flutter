@@ -86,12 +86,12 @@ class _menuCarritoState extends State<menuCarrito> {
               // Lógica para el segundo botón flotante (finalizar pedido)
               // Puedes realizar acciones adicionales aquí para finalizar el pedido
               final conn = await DatabaseConnection.instance.openConnection();
-
               final results = await conn.execute(
                 'SELECT TOT_PED FROM MAESTRO_PEDIDOS WHERE ID_PED  = \$1',
                 parameters: [globalState.idPed],
               );
               await conn.close();
+              
               if (results.isNotEmpty) {
                 String totalPedido = results.first[0] as String;
                 final globalState =

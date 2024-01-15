@@ -35,13 +35,13 @@ class _menuPedidos1State extends State<menuPedidos1> {
       if (mounted) {
         setState(() {
           final globalState = Provider.of<GlobalState>(context, listen: false);
-          String cedula = data['cedEmp'];
+          String? cedula = data['cedEmp'];
           int idPed = data['idPed'];
           int mesa = data['mesa'];
-          String nombre = data['nombre'];
+          String? nombre = data['nombre'];
           String pedido = data['message'];
 
-          if (globalState.cedEmpAti == cedula) {
+          if (cedula != null && globalState.cedEmpAti == cedula) {
             AwesomeNotifications().createNotification(
               content: NotificationContent(
                 id: DateTime.now().millisecondsSinceEpoch.remainder(
@@ -131,7 +131,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
         ],
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/');
             },
             icon: Icon(Icons.arrow_back, color: Colors.white)),
       ),

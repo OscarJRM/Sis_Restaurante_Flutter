@@ -245,9 +245,14 @@ class _ListaPedidosState extends State<ListaPedidos> {
         setState(() {
           cargarPedidos();
           print("carga");
-          String nombre = data['nombre'];
-          if (nombre.isEmpty || nombre == null) {
-            _mostrarSnackbar(context, "Pedido #$idePed entrante!");
+          String pedido = data['message'];
+          String? nombre = data['nombre'];
+          if (nombre == null) {
+            if (pedido == "Enviado") {
+              _mostrarSnackbar(context, "Pedido #$idePed entrante!");
+            } else if (pedido == "Terminado") {
+              _mostrarSnackbar(context, "Pedido #$idePed Despachado!");
+            }
           }
 
           //_sound();
@@ -275,7 +280,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
   Future<void> cargarPedidos() async {
     print("Cargando pedidos");
     final connection = await DatabaseConnection.instance.openConnection();
-    final results = await connection.execute('SELECT * FROM MAESTRO_PEDIDOS');
+    final results = await connection
+        .execute('SELECT * FROM MAESTRO_PEDIDOS WHERE ID_EST_PED<>\'DES\'');
 
     final List<Pedido> pedidosList = results.map((row) {
       return Pedido(
