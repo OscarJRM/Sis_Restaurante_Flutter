@@ -319,42 +319,32 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
         ),
       );
 
-       // Crear el PDF como bytes
-  final pdfBytes = await pdf.save();
+      // Guardar el PDF en el sistema de archivos
+      final pdfOutput = await getApplicationDocumentsDirectory();
+      final pdfFileName =
+          'factura_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final pdfFile = File('${pdfOutput.path}/$pdfFileName');
+      await pdfFile.writeAsBytes(await pdf.save());
 
-  // Actualizar la base de datos con los bytes del PDF
-  await connection.execute(
-    "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision, pdf_path, id_ped_per) VALUES "
-    "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}', ${pdfBytes}, ${globalState.idPed})",
-  );
+      // Actualizar la base de datos con la ruta del PDF
+      final pdfPath = pdfFile.path;
+      await connection.execute(
+        "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision, pdf_path, id_ped_per) VALUES "
+        "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}', '$pdfPath', ${globalState.idPed})",
+      );
 
-  await connection.close();
+      await connection.close();
 
-  print('Cliente facturado con éxito. PDF almacenado en la base de datos.');
-  _mostrarPDF(pdfBytes);
+      print('Cliente facturado con éxito. PDF almacenado en: $pdfPath');
+      _mostrarPDF(pdfPath);
     } else {
       // Manejar el caso en que no se encuentre el cliente
     }
   }
 
-
-void _mostrarPDF(Uint8List pdfBytes) async {
-  final status = await Permission.storage.status;
-  if (status.isGranted) {
-    final directory = await getApplicationDocumentsDirectory();
-    final pdfPath = '${directory.path}/factura.pdf';
-
-    await File(pdfPath).writeAsBytes(pdfBytes);
-
+  void _mostrarPDF(String pdfPath) {
     OpenFile.open(pdfPath);
-  } else {
-    if (await Permission.storage.request().isGranted) {
-      _mostrarPDF(pdfBytes); // Vuelve a intentar después de obtener el permiso.
-    } else {
-      // Manejar el caso en que el usuario no concede el permiso.
-    }
   }
-}
 
 
   Future<void> registrarNuevoCliente() async {
