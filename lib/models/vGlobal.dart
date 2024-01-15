@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sistema_restaurante/models/platos.dart';
@@ -7,6 +9,7 @@ class GlobalState extends ChangeNotifier {
   int idPed = 0;
   String Nom = '';
   String Ape = ''; // Agrega la nueva variable
+  double Total = 0.00;
 
   void updateCedEmpAti(String newCedEmpAti) {
     cedEmpAti = newCedEmpAti;
@@ -23,6 +26,10 @@ class GlobalState extends ChangeNotifier {
 
   void updateApe(String newApe) {
     Ape = newApe;
+  }
+
+  void updateTotal(String newTotal) {
+    Total = double.parse(newTotal);
   }
 
   List<Plato> pedidos = [];
