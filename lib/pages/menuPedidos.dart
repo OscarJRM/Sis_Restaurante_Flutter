@@ -34,17 +34,24 @@ class _menuPedidos1State extends State<menuPedidos1> {
       print(data);
       if (mounted) {
         setState(() {
-          print("cargatraka");
-          AwesomeNotifications().createNotification(
-            content: NotificationContent(
-              id: DateTime.now()
-                  .millisecondsSinceEpoch
-                  .remainder(2147483647), // Usar la hora actual como ID único,
-              channelKey: 'basic_channel',
-              title: 'Notificación',
-              body: 'Esta es una notificación' + data.toString(),
-            ),
-          );
+          final globalState = Provider.of<GlobalState>(context, listen: false);
+          String cedula = data['cedEmp'];
+          int idPed = data['idPed'];
+          int mesa = data['mesa'];
+          String nombre = data['nombre'];
+          String pedido = data['message'];
+
+          if (globalState.cedEmpAti == cedula) {
+            AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                id: DateTime.now().millisecondsSinceEpoch.remainder(
+                    2147483647), // Usar la hora actual como ID único,
+                channelKey: 'basic_channel',
+                title: 'Pedido de #$idPed de la mesa $mesa',
+                body: '$nombre: $pedido',
+              ),
+            );
+          }
         });
       }
     });

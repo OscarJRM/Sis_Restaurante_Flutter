@@ -42,8 +42,8 @@ class _menuCarritoState extends State<menuCarrito> {
     webSocketClient.sink.add("{'mensaje':'actualizar_lista'}");
   }*/
 
-  _sendMessage(String cedula, String pedido, IO.Socket? _socket) {
-    _socket?.emit("message", {'message': pedido, 'sender': cedula});
+  _sendMessage(String cedula, String pedido,int idPed, IO.Socket? _socket) {
+    _socket?.emit("message", {'message': pedido, 'sender': cedula,'idPed':idPed});
   }
 
   @override
@@ -69,7 +69,7 @@ class _menuCarritoState extends State<menuCarrito> {
 
                 await conn.close();
                 _sendMessage(
-                    globalState.cedEmpAti, "Enviado", globalState.socket);
+                    globalState.cedEmpAti, "Enviado",globalState.idPed, globalState.socket);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Pedido enviado a cocina'),
