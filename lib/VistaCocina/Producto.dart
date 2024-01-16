@@ -41,6 +41,17 @@ class _ProductoWidgetState extends State<ProductoWidget> {
 
   _sendMessage(String cedula, String pedido, int idPed, String nombre, int mesa,
       IO.Socket? _socket) {
+    _socket?.emit("mesero", {
+      'message': pedido,
+      'cedEmp': cedula,
+      'idPed': idPed,
+      'nombre': nombre,
+      'mesa': mesa
+    });
+  }
+
+  _sendMessage2(String cedula, String pedido, int idPed, String nombre,
+      int mesa, IO.Socket? _socket) {
     _socket?.emit("message", {
       'message': pedido,
       'cedEmp': cedula,
@@ -157,6 +168,13 @@ class _ProductoWidgetState extends State<ProductoWidget> {
                       estado = 'Listo';
                     }
                     _sendMessage(
+                        globalState.cedEmpAti,
+                        estado,
+                        widget.producto.idPedidoPertenece,
+                        widget.producto.nombre,
+                        globalState.mesa,
+                        globalState.socket);
+                    _sendMessage2(
                         globalState.cedEmpAti,
                         estado,
                         widget.producto.idPedidoPertenece,

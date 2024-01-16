@@ -134,8 +134,16 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
               ElevatedButton(
                 onPressed: () async {
                   await facturarCliente();
+                  final globalState =
+                      Provider.of<GlobalState>(context, listen: false);
 
-                  Navigator.of(context).pop();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => menuPedidos1(
+                              globalState.cedEmpAti,
+                              globalState.Nom,
+                              globalState.Ape)));
                 },
                 child: const Text('Facturar'),
               ),
@@ -228,15 +236,15 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
 
   Future<void> facturarCliente() async {
     final connection = await DatabaseConnection.instance.openConnection();
-    //final globalState = Provider.of<GlobalState>(context, listen: false);
+    final globalState = Provider.of<GlobalState>(context, listen: false);
 
     await connection.execute(
-      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = 11",
+      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
     );
 
     // Obtener el número de mesa del pedido
     final resultsMesa = await connection.execute(
-      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = 11",
+      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
     );
 
     if (resultsMesa.isNotEmpty) {
@@ -250,8 +258,8 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     final results = await connection.execute(
       "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
     );
-   // _sendMessage(globalState.cedEmpAti, "Terminado", globalState.idPed,
-     //   globalState.socket);
+    _sendMessage(globalState.cedEmpAti, "Terminado", globalState.idPed,
+        globalState.socket);
 
     if (results.isNotEmpty) {
       final clienteInfo = results.first;
@@ -280,11 +288,12 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
         ];
       }).toList();
 
-            final resultsCorreo = await connection.execute(
+      final resultsCorreo = await connection.execute(
         "SELECT cor_cli FROM clientes WHERE ced_cli = '${cedulaController.text}'",
       );
 
-        Object? clienteCorreo = resultsCorreo.isNotEmpty ? resultsCorreo.first[0] : '';
+      Object? clienteCorreo =
+          resultsCorreo.isNotEmpty ? resultsCorreo.first[0] : '';
 
       // Crear el PDF
       final pdf = pw.Document();
@@ -349,22 +358,22 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     }
   }
 
-void _mostrarPDF(String pdfPath, String clienteCorreo) async {
-  final Email email = Email(
-    body: 'Adjunto encontrarás la factura en formato PDF.',
-    subject: 'Factura de compra',
-    recipients: [clienteCorreo],
-    attachmentPaths: [pdfPath],
-    isHTML: false,
-  );
+  void _mostrarPDF(String pdfPath, String clienteCorreo) async {
+    final Email email = Email(
+      body: 'Adjunto encontrarás la factura en formato PDF.',
+      subject: 'Factura de compra',
+      recipients: [clienteCorreo],
+      attachmentPaths: [pdfPath],
+      isHTML: false,
+    );
 
-  try {
-    await FlutterEmailSender.send(email);
-  } catch (error) {
-    print('Error al enviar el correo: $error');
-    // Manejar errores de envío de correo según sea necesario
+    try {
+      await FlutterEmailSender.send(email);
+    } catch (error) {
+      print('Error al enviar el correo: $error');
+      // Manejar errores de envío de correo según sea necesario
+    }
   }
-}
 
   Future<void> registrarNuevoCliente() async {
     final connection = await DatabaseConnection.instance.openConnection();

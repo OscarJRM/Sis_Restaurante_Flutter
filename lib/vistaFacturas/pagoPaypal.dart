@@ -74,7 +74,7 @@ class PaypalPaymentDemo extends StatelessWidget {
         "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
       );
     }
-
+  
     Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) => PaypalCheckoutView(
         sandboxMode: true,

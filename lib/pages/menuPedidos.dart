@@ -21,17 +21,21 @@ class menuPedidos1 extends StatefulWidget {
 
 class _menuPedidos1State extends State<menuPedidos1> {
   late IO.Socket _socket;
+  dynamic _lastMessage =
+      ''; // Variable para almacenar el último mensaje recibido
 
   _sendMessage(String pedido) {
     _socket.emit("message", {'message': pedido, 'sender': widget._name});
   }
 
   _connectSocket() {
+    dynamic data = '';
     _socket.onConnect((data) => print('Connected'));
     _socket.onConnectError((data) => print('Error $data'));
     _socket.onDisconnect((data) => print('Disconnected'));
-    _socket.on("message", (data) {
+    _socket.on("mesero", (data) {
       print(data);
+
       if (mounted) {
         setState(() {
           final globalState = Provider.of<GlobalState>(context, listen: false);
@@ -40,6 +44,11 @@ class _menuPedidos1State extends State<menuPedidos1> {
           int? mesa = data['mesa'];
           String? nombre = data['nombre'];
           String pedido = data['message'];
+          print(_lastMessage);
+          print(data == _lastMessage);
+          if (data == _lastMessage) {
+            return; // Evitar la acción si es el mismo mensaje
+          }
 
           if (cedula != null &&
               globalState.cedEmpAti == cedula &&
@@ -61,6 +70,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
 
   @override
   void initState() {
+    super.initState();
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
       onNotificationCreatedMethod:
@@ -70,7 +80,6 @@ class _menuPedidos1State extends State<menuPedidos1> {
       onDismissActionReceivedMethod:
           NotificationController.onDismissActionReceivedMethod,
     );
-    super.initState();
     _socket = IO.io(
         'https://sistemarestaurante.webpubsub.azure.com',
         IO.OptionBuilder()
@@ -133,7 +142,7 @@ class _menuPedidos1State extends State<menuPedidos1> {
         ],
         leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/');
+              Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back, color: Colors.white)),
       ),
