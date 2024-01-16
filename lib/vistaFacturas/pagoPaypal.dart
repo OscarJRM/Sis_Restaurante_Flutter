@@ -74,12 +74,14 @@ class PaypalPaymentDemo extends StatelessWidget {
         "UPDATE mesas SET est_mes = 'DISPONIBLE' WHERE num_mes = $numMesa",
       );
     }
-  
+
     Navigator.of(context).push(MaterialPageRoute(
       builder: (BuildContext context) => PaypalCheckoutView(
         sandboxMode: true,
-        clientId: "AYMgb0omsVCczLsG2hCYo9ZPB7bizff_JXI25ZuO-LXKdJc8zWOxiGYr-BcSmAgoTsx0mXq4PkoTD0mt",
-        secretKey: "ECufueUM6jMOTwgwc8y7nbkm6HQ9ynzd71e45F0nTa2dbqALFYrGCbT0EQxp91yk_VMtg-POqOwtNddy",
+        clientId:
+            "AYMgb0omsVCczLsG2hCYo9ZPB7bizff_JXI25ZuO-LXKdJc8zWOxiGYr-BcSmAgoTsx0mXq4PkoTD0mt",
+        secretKey:
+            "ECufueUM6jMOTwgwc8y7nbkm6HQ9ynzd71e45F0nTa2dbqALFYrGCbT0EQxp91yk_VMtg-POqOwtNddy",
         transactions: [
           {
             "amount": {
@@ -94,9 +96,10 @@ class PaypalPaymentDemo extends StatelessWidget {
               "items": [
                 for (var detallePlato in detallesPlatos)
                   {
-                    "Nombre": detallePlato[0],
-                    "Cantidad": detallePlato[1],
-                    "Total": (double.parse(detallePlato[1].toString()) * double.parse(detallePlato[2].toString())).toStringAsFixed(2),
+                    "name": detallePlato[0], // Change "Nombre" to "name"
+                    "quantity": detallePlato[1],
+                    "price": (double.parse(detallePlato[2].toString()))
+                        .toStringAsFixed(2),
                     "currency": "USD"
                   },
               ],
