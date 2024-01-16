@@ -12,7 +12,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:open_file/open_file.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class PagoEfectivoView extends StatefulWidget {
   @override
@@ -228,15 +227,15 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
 
   Future<void> facturarCliente() async {
     final connection = await DatabaseConnection.instance.openConnection();
-    //final globalState = Provider.of<GlobalState>(context, listen: false);
+    final globalState = Provider.of<GlobalState>(context, listen: false);
 
     await connection.execute(
-      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = 11",
+      "UPDATE maestro_pedidos SET id_est_ped = 'DES' WHERE id_ped = ${globalState.idPed}",
     );
 
     // Obtener el número de mesa del pedido
     final resultsMesa = await connection.execute(
-      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = 11",
+      "SELECT num_mes_pid FROM maestro_pedidos WHERE id_ped = ${globalState.idPed}",
     );
 
     if (resultsMesa.isNotEmpty) {
@@ -250,8 +249,8 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
     final results = await connection.execute(
       "SELECT * FROM clientes WHERE ced_cli = '${cedulaController.text}'",
     );
-   // _sendMessage(globalState.cedEmpAti, "Terminado", globalState.idPed,
-     //   globalState.socket);
+    _sendMessage(globalState.cedEmpAti, "Terminado", globalState.idPed,
+        globalState.socket);
 
     if (results.isNotEmpty) {
       final clienteInfo = results.first;
@@ -268,7 +267,7 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
       final resultsPlatos = await connection.execute(
         "SELECT productos.nom_pro, detalle_pedidos.can_pro_ped, productos.pre_uni_pro FROM detalle_pedidos "
         "INNER JOIN productos ON detalle_pedidos.id_pro_ped = productos.id_pro "
-        "WHERE detalle_pedidos.id_ped_per = 11",
+        "WHERE detalle_pedidos.id_ped_per = ${globalState.idPed}",
       );
 
       final detallesPlatos = resultsPlatos.map((detalle) {
@@ -279,12 +278,6 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
           // Agrega otras columnas según sea necesario
         ];
       }).toList();
-
-            final resultsCorreo = await connection.execute(
-        "SELECT cor_cli FROM clientes WHERE ced_cli = '${cedulaController.text}'",
-      );
-
-        Object? clienteCorreo = resultsCorreo.isNotEmpty ? resultsCorreo.first[0] : '';
 
       // Crear el PDF
       final pdf = pw.Document();
@@ -304,7 +297,7 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
                         pw.Text('${columnNames[entry.key]}: ${entry.value}'),
                   ),
               pw.SizedBox(height: 12),
-              pw.Text('Monto Total: \$10'),
+              pw.Text('Monto Total: \$${globalState.Total}'),
               pw.Text(
                   'Fecha de Emisión: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())}'),
               pw.SizedBox(height: 12),
@@ -337,34 +330,21 @@ class _PagoEfectivoViewState extends State<PagoEfectivoView> {
       final pdfPath = pdfFile.path;
       await connection.execute(
         "INSERT INTO facturas (ced_cli, id_pag, monto_total, fecha_emision, pdf_path, id_ped_per) VALUES "
-        "('${cedulaController.text}', 1, 10, '${DateTime.now().toLocal()}', '$pdfPath', 11)",
+        "('${cedulaController.text}', 1, ${globalState.Total}, '${DateTime.now().toLocal()}', '$pdfPath', ${globalState.idPed})",
       );
 
       await connection.close();
 
       print('Cliente facturado con éxito. PDF almacenado en: $pdfPath');
-      _mostrarPDF(pdfPath, clienteCorreo.toString());
+      _mostrarPDF(pdfPath);
     } else {
       // Manejar el caso en que no se encuentre el cliente
     }
   }
 
-void _mostrarPDF(String pdfPath, String clienteCorreo) async {
-  final Email email = Email(
-    body: 'Adjunto encontrarás la factura en formato PDF.',
-    subject: 'Factura de compra',
-    recipients: [clienteCorreo],
-    attachmentPaths: [pdfPath],
-    isHTML: false,
-  );
-
-  try {
-    await FlutterEmailSender.send(email);
-  } catch (error) {
-    print('Error al enviar el correo: $error');
-    // Manejar errores de envío de correo según sea necesario
+  void _mostrarPDF(String pdfPath) {
+    OpenFile.open(pdfPath);
   }
-}
 
   Future<void> registrarNuevoCliente() async {
     final connection = await DatabaseConnection.instance.openConnection();
