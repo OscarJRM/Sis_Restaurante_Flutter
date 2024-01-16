@@ -59,6 +59,7 @@ class _menuCarritoState extends State<menuCarrito> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: FloatingActionButton(
+              heroTag: "btn1",
               onPressed: () async {
                 // Lógica para el primer botón flotante
                 final conn = await DatabaseConnection.instance.openConnection();
@@ -69,9 +70,11 @@ class _menuCarritoState extends State<menuCarrito> {
                 );
 
                 await conn.close();
-                await conn.close();
+
                 _sendMessage(globalState.cedEmpAti, "Enviado",
                     globalState.idPed, globalState.socket);
+                print("Enviado");
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Pedido enviado a cocina'),
@@ -84,6 +87,7 @@ class _menuCarritoState extends State<menuCarrito> {
             ),
           ),
           FloatingActionButton(
+            heroTag: "btn2",
             onPressed: () async {
               // Lógica para el segundo botón flotante (finalizar pedido)
               // Puedes realizar acciones adicionales aquí para finalizar el pedido
@@ -121,13 +125,6 @@ class _menuCarritoState extends State<menuCarrito> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MetodosPago(),
-                  ),
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Pedido finalizado'),
-                    backgroundColor: Colors.blue,
                   ),
                 );
               } else {
